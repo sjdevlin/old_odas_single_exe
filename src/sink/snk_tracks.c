@@ -148,14 +148,16 @@
         obj->sserver.sin_family = AF_INET;
         obj->sserver.sin_addr.s_addr = inet_addr(obj->interface->ip);
         obj->sserver.sin_port = htons(obj->interface->port);
-        obj->sid = socket(AF_INET, SOCK_STREAM, 0);
+        obj->sid = socket(AF_INET, SOCK_DGRAM, 0);
 
-        if ( (connect(obj->sid, (struct sockaddr *) &(obj->sserver), sizeof(obj->sserver))) < 0 ) {
+// sd changed to use UDP
+//        if ( (bind(obj->sid, (struct sockaddr *) &(obj->sserver), sizeof(obj->sserver))) < 0 ) {
 
-            printf("Sink tracks: Cannot connect to server\n");
-            exit(EXIT_FAILURE);
+  //          printf("Sink tracks: Cannot bind to socket\n");
 
-        }   
+    //        exit(EXIT_FAILURE);
+
+      //  }   
 
     }
 
@@ -234,6 +236,8 @@
 
         if (obj->in->timeStamp != 0) {
 
+            if (obj->in->timeStamp %20 == 0 ) {
+
             switch(obj->format->type) {
 
                 case format_text_json:
@@ -291,8 +295,9 @@
                 break;
 
             }
-
+            }
             rtnValue = 0;
+
 
         }
         else {
@@ -319,7 +324,8 @@
 
     void snk_tracks_process_interface_socket(snk_tracks_obj * obj) {
 
-        if (send(obj->sid, obj->buffer, obj->bufferSize, 0) < 0) {
+// sd changed to UDP
+        if (sendto(obj->sid, obj->buffer, obj->bufferSize, MSG_DONTWAIT, (struct sockaddr *) &(obj->sserver), sizeof(obj->sserver)) < 0) {
             printf("Sink tracks: Could not send message.\n");
             exit(EXIT_FAILURE);
         }  

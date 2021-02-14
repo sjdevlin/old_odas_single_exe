@@ -139,6 +139,7 @@
 
     }
 
+
     void snk_pots_open_interface_socket(snk_pots_obj * obj) {
 
         memset(&(obj->sserver), 0x00, sizeof(struct sockaddr_in));
@@ -146,11 +147,12 @@
         obj->sserver.sin_family = AF_INET;
         obj->sserver.sin_addr.s_addr = inet_addr(obj->interface->ip);
         obj->sserver.sin_port = htons(obj->interface->port);
-        obj->sid = socket(AF_INET, SOCK_STREAM, 0);
+        obj->sid = socket(AF_INET, SOCK_DGRAM, 0);
 
-        if ( (connect(obj->sid, (struct sockaddr *) &(obj->sserver), sizeof(obj->sserver))) < 0 ) {
+// sd changed to use UDP
+        if ( (bind(obj->sid, (struct sockaddr *) &(obj->sserver), sizeof(obj->sserver))) < 0 ) {
 
-            printf("Sink pots: Cannot connect to server\n");
+            printf("Sink pots: Cannot bind to socket\n");
             exit(EXIT_FAILURE);
 
         }  
@@ -230,7 +232,11 @@
 
         int rtnValue;
 
-        if (obj->in->timeStamp != 0) {
+// sd - changed to only fire format and interface every sec or so
+
+        if (obj->in->timeStamp != 0 ) {
+
+            if (obj->in->timeStamp % 100 == 0) {
 
             switch(obj->format->type) {
 
@@ -299,12 +305,13 @@
             rtnValue = 0;
 
         }
+        }
         else {
 
             rtnValue = -1;
 
+        
         }
-
         return rtnValue;
 
     }
@@ -323,7 +330,8 @@
 
     void snk_pots_process_interface_socket(snk_pots_obj * obj) {
 
-        if (send(obj->sid, obj->buffer, obj->bufferSize, 0) < 0) {
+// sd changed to UDP
+        if (sendto(obj->sid, obj->buffer, obj->bufferSize, MSG_DONTWAIT, (struct sockaddr *) &(obj->sserver), sizeof(obj->sserver)) < 0) {
             printf("Sink pots: Could not send message.\n");
             exit(EXIT_FAILURE);
         }        

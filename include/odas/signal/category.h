@@ -30,7 +30,10 @@
     typedef struct categories_obj {
 
         unsigned int nSignals;
-        char * array;
+        float * energy_array;
+        float * X_array;
+        float * Y_array;
+        float * freq_array;
 
     } categories_obj;
 

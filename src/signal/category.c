@@ -30,8 +30,20 @@
         obj = (categories_obj *) malloc(sizeof(categories_obj));
 
         obj->nSignals = nSignals;
-        obj->array = (char *) malloc(sizeof(char) * nSignals);
-        memset(obj->array, 0x00, sizeof(char) * nSignals);
+
+        obj->energy_array = (float *) malloc(sizeof(float) * nSignals);
+        memset(obj->energy_array, 0x00, sizeof(float) * nSignals);
+
+        obj->X_array = (float *) malloc(sizeof(float) * nSignals);
+        memset(obj->X_array, 0x00, sizeof(float) * nSignals);
+
+        obj->Y_array = (float *) malloc(sizeof(float) * nSignals);
+        memset(obj->Y_array, 0x00, sizeof(float) * nSignals);
+
+        obj->freq_array = (float *) malloc(sizeof(float) * nSignals);
+        memset(obj->freq_array, 0x00, sizeof(float) * nSignals);
+
+
 
         return obj;
 
@@ -39,20 +51,29 @@
 
     void categories_destroy(categories_obj * obj) {
 
-        free((void *) obj->array);
+        free((void *) obj->energy_array);
+        free((void *) obj->X_array);
+        free((void *) obj->Y_array);
+        free((void *) obj->freq_array);
         free((void *) obj);
 
     }
 
     void categories_copy(categories_obj * dest, const categories_obj * src) {
 
-        memcpy(dest->array, src->array, sizeof(char) * src->nSignals);
+        memcpy(dest->energy_array, src->energy_array, sizeof(float) * src->nSignals);
+        memcpy(dest->X_array, src->X_array, sizeof(float) * src->nSignals);
+        memcpy(dest->Y_array, src->Y_array, sizeof(float) * src->nSignals);
+        memcpy(dest->freq_array, src->freq_array, sizeof(float) * src->nSignals);
 
     }
 
     void categories_zero(categories_obj * obj) {
 
-        memset(obj->array, 0x00, sizeof(char) * obj->nSignals);
+        memset(obj->energy_array, 0x00, sizeof(float) * obj->nSignals);
+        memset(obj->X_array, 0x00, sizeof(float) * obj->nSignals);
+        memset(obj->Y_array, 0x00, sizeof(float) * obj->nSignals);
+        memset(obj->freq_array, 0x00, sizeof(float) * obj->nSignals);
 
     }
 
@@ -62,7 +83,10 @@
 
         for (iSignal = 0; iSignal < obj->nSignals; iSignal++) {
 
-            printf("(%02u): %c\n",iSignal,obj->array[iSignal]);
+            printf("(%02u): %3.2f\n",iSignal,obj->X_array[iSignal]);
+            printf("(%02u): %3.2f\n",iSignal,obj->Y_array[iSignal]);
+            printf("(%02u): %3.2f\n",iSignal,obj->energy_array[iSignal]);
+            printf("(%02u): %3.2f\n",iSignal,obj->freq_array[iSignal]);
 
         }
 

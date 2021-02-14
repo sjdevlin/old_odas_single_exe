@@ -143,14 +143,15 @@
         obj->sserver.sin_family = AF_INET;
         obj->sserver.sin_addr.s_addr = inet_addr(obj->interface->ip);
         obj->sserver.sin_port = htons(obj->interface->port);
-        obj->sid = socket(AF_INET, SOCK_STREAM, 0);
+        obj->sid = socket(AF_INET, SOCK_DGRAM, 0);
 
-        if ( (connect(obj->sid, (struct sockaddr *) &(obj->sserver), sizeof(obj->sserver))) < 0 ) {
+// sd changed to use UDP
+ //       if ( (bind(obj->sid, (struct sockaddr *) &(obj->sserver), sizeof(obj->sserver))) < 0 ) {
 
-            printf("Sink categories: Cannot connect to server\n");
-            exit(EXIT_FAILURE);
+   //         printf("Sink categories: Cannot connect to server\n");
+     //       exit(EXIT_FAILURE);
 
-        }          
+       // }          
 
     }
 
@@ -229,6 +230,8 @@
 
         if (obj->in->timeStamp != 0) {
 
+            if (obj->in->timeStamp%20 == 0) {
+
             switch(obj->format->type) {
 
                 case format_text_json:
@@ -288,7 +291,7 @@
             }
 
             rtnValue = 0;
-
+        }
         }
         else {
 
@@ -314,7 +317,8 @@
 
     void snk_categories_process_interface_socket(snk_categories_obj * obj) {
 
-        if (send(obj->sid, obj->buffer, obj->bufferSize, 0) < 0) {
+// sd changed to UDP
+        if (sendto(obj->sid, obj->buffer, obj->bufferSize, MSG_DONTWAIT, (struct sockaddr *) &(obj->sserver), sizeof(obj->sserver)) < 0) {
             printf("Sink categories: Could not send message.\n");
             exit(EXIT_FAILURE);
         }
@@ -339,28 +343,12 @@
 
         for (iChannel = 0; iChannel < obj->nChannels; iChannel++) {
 
-            switch(obj->in->categories->array[iChannel]) {
-
-                case 0x01:
-
-                    sprintf(obj->buffer,"%s        { \"category\": \"speech\" }",obj->buffer);
-
-                break;
-
-                case 0x00:
-
-                    sprintf(obj->buffer,"%s        { \"category\": \"nonspeech\" }",obj->buffer);
-
-                break;
-
-                default:
-
-                    sprintf(obj->buffer,"%s        { \"category\": \"undefined\" }",obj->buffer);
-
-                break;
-
-            }
-
+// sd changed to write out base frequency of each source
+            sprintf(obj->buffer,"%s        { \"activity\": %1.1f }",obj->buffer, obj->in->categories->energy_array[iChannel]);
+            sprintf(obj->buffer,"%s        { \"x\": %3.2f }",obj->buffer, obj->in->categories->X_array[iChannel]);
+            sprintf(obj->buffer,"%s        { \"y\": %3.2f }",obj->buffer, obj->in->categories->Y_array[iChannel]);
+            sprintf(obj->buffer,"%s        { \"freq\": %3.0f }",obj->buffer, obj->in->categories->freq_array[iChannel]);
+            
             if (iChannel != (obj->nChannels - 1)) {
 
                 sprintf(obj->buffer,"%s,",obj->buffer);
