@@ -230,7 +230,7 @@
 
         if (obj->in->timeStamp != 0) {
 
-            if (obj->in->timeStamp%20 == 0) {
+            if (obj->in->timeStamp%200 == 0) {
 
             switch(obj->format->type) {
 
