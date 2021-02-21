@@ -101,8 +101,16 @@
 
 
 
-                if (obj->categories[iSep] != 0x01) {
+                if (obj->categories[iSep] == 0x01) {
 
+                        categories->freq_array[iSep] = pitches->array[iSep];
+                        categories->energy_array[iSep] = tracks->activity[iSep];
+                        categories->X_array[iSep] = tracks->array[iSep];
+                        categories->Y_array[iSep] = tracks->array[iSep+1];
+
+
+		    } 
+		    else {
                     // tau_i
                     obj->tausNow[iSep] = pitches->array[iSep];
 
@@ -149,11 +157,6 @@
                         obj->categories[iSep] = 0x01;
 
                         //only if MeetPie thinks its speech do we assign values
-                        categories->freq_array[iSep] = pitches->array[iSep];
-                        categories->energy_array[iSep] = tracks->activity[iSep];
-                        categories->X_array[iSep] = tracks->array[iSep];
-                        categories->Y_array[iSep] = tracks->array[iSep+1];
-
 
                     }
                     else {
@@ -184,6 +187,12 @@
                 obj->vs[iSep] = 0.0f;
                 obj->rs[iSep] = 0.0f;
                 obj->categories[iSep] = 0x00;
+
+                categories->freq_array[iSep] = 0.0f;
+                categories->energy_array[iSep] = 0.0f;
+                categories->X_array[iSep] = 0.0f;
+                categories->Y_array[iSep] = 0.0f;
+
 
             }
 
