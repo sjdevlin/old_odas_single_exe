@@ -236,7 +236,7 @@
 
         if (obj->in->timeStamp != 0) {
 
-            if (obj->in->timeStamp %20 == 0 ) {
+            if (obj->in->timeStamp %200 == 0 ) {
 
             switch(obj->format->type) {
 
@@ -329,7 +329,7 @@
             printf("Sink tracks: Could not send message.\n");
             exit(EXIT_FAILURE);
         }  
-
+	printf("%s",obj->buffer);
     }
 
     void snk_tracks_process_interface_terminal(snk_tracks_obj * obj) {
@@ -350,7 +350,12 @@
 
         for (iTrack = 0; iTrack < obj->nTracks; iTrack++) {
 
-            sprintf(obj->buffer,"%s        { \"id\": %llu, \"tag\": \"%s\", \"x\": %1.3f, \"y\": %1.3f, \"z\": %1.3f, \"activity\": %1.3f }", 
+            sprintf(obj->buffer,"%s        { \"activity\": %1.1f ,",obj->buffer, obj->in->tracks->activity[iTrack]);
+            sprintf(obj->buffer,"%s \"x\": %1.3f ,",obj->buffer, obj->in->tracks->array[iTrack*3+0]);
+            sprintf(obj->buffer,"%s \"y\": %1.3f ,",obj->buffer, obj->in->tracks->array[iTrack*3+1]);
+            sprintf(obj->buffer,"%s \"freq\": %3.0f }",obj->buffer, 0.0);
+
+/*            sprintf(obj->buffer,"%s        { \"id\": %llu, \"tag\": \"%s\", \"x\": %1.3f, \"y\": %1.3f, \"z\": %1.3f, \"activity\": %1.3f }", 
                     obj->buffer,
                     obj->in->tracks->ids[iTrack],
                     obj->in->tracks->tags[iTrack],
@@ -358,7 +363,7 @@
                     obj->in->tracks->array[iTrack*3+1], 
                     obj->in->tracks->array[iTrack*3+2],
                     obj->in->tracks->activity[iTrack]);
-
+*/
             if (iTrack != (obj->nTracks - 1)) {
 
                 sprintf(obj->buffer,"%s,",obj->buffer);

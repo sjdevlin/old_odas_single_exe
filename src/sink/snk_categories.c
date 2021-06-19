@@ -322,7 +322,7 @@
             printf("Sink categories: Could not send message.\n");
             exit(EXIT_FAILURE);
         }
-	printf("%s\n", obj->buffer);
+//	printf("%s\n", obj->buffer);
     }
 
     void snk_categories_process_interface_terminal(snk_categories_obj * obj) {
