@@ -236,7 +236,7 @@
 
         if (obj->in->timeStamp != 0) {
 
-            if (obj->in->timeStamp %200 == 0 ) {
+            if (obj->in->timeStamp %20 == 0 ) {
 
             switch(obj->format->type) {
 
@@ -329,7 +329,7 @@
             printf("Sink tracks: Could not send message.\n");
             exit(EXIT_FAILURE);
         }  
-	printf("%s",obj->buffer);
+//	printf("%s",obj->buffer);
     }
 
     void snk_tracks_process_interface_terminal(snk_tracks_obj * obj) {

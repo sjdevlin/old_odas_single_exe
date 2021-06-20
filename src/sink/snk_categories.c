@@ -230,7 +230,7 @@
 
         if (obj->in->timeStamp != 0) {
 
-            if (obj->in->timeStamp%200 == 0) {
+            if (obj->in->timeStamp%100 == 0) {
 
             switch(obj->format->type) {
 
@@ -345,8 +345,8 @@
 
 // sd changed to write out base frequency of each source
             sprintf(obj->buffer,"%s        { \"activity\": %1.1f ,",obj->buffer, obj->in->categories->energy_array[iChannel]);
-            sprintf(obj->buffer,"%s \"x\": %3.2f ,",obj->buffer, obj->in->categories->X_array[iChannel]);
-            sprintf(obj->buffer,"%s \"y\": %3.2f ,",obj->buffer, obj->in->categories->Y_array[iChannel]);
+            sprintf(obj->buffer,"%s \"x\": %1.3f ,",obj->buffer, obj->in->categories->X_array[iChannel]);
+            sprintf(obj->buffer,"%s \"y\": %1.3f ,",obj->buffer, obj->in->categories->Y_array[iChannel]);
             sprintf(obj->buffer,"%s \"freq\": %3.0f }",obj->buffer, obj->in->categories->freq_array[iChannel]);
             
             if (iChannel != (obj->nChannels - 1)) {
