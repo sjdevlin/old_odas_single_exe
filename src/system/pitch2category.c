@@ -105,8 +105,8 @@
 
                         categories->freq_array[iSep] = pitches->array[iSep];
                         categories->energy_array[iSep] = tracks->activity[iSep];
-                        categories->X_array[iSep] = tracks->array[iSep];
-                        categories->Y_array[iSep] = tracks->array[iSep+1];
+                        categories->X_array[iSep] = tracks->array[3*iSep];
+                        categories->Y_array[iSep] = tracks->array[3*iSep+1];
 
 
 		    } 
