@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "snk_categories.h": "c",
+        "type_traits": "cpp"
+    }
+}

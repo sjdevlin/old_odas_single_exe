@@ -197,8 +197,10 @@ target_link_libraries(odas
     pthread
 )
 
-add_executable(odaslive
-    demo/odaslive/main.c
+add_executable(meetpie
+    demo/odaslive/meetpie.cpp
+    demo/odaslive/meeting.cpp
+    demo/odaslive/odas.cpp
     demo/odaslive/configs.c
     demo/odaslive/objects.c
     demo/odaslive/parameters.c
