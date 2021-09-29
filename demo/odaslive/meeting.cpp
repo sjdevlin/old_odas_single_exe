@@ -1,13 +1,8 @@
 
+#include "audio.h"
 #include "meeting.h"
-#include "odas_public.h"
 
-MEETING(char mode)
-{
-    debug = mode;
-}
-
-void MEETING::Initialize(std::string)
+void MEETING::Initialize()
 {
     int i;
     // initialise meeting array
@@ -33,7 +28,7 @@ void MEETING::Initialize(std::string)
     num_talking = 0;
 }
 
-void MEETING::ProcessLatestData(ODAS odas_obj)
+void MEETING::ProcessLatestData(AUDIO odas_obj)
 {
 
     int target_angle, iChannel, iAngle;

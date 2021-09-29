@@ -1,47 +1,12 @@
-#include "../../include/odas/odas.h"
+#include "audio.h"
 
-#include "parameters.h"
-#include "configs.h"
-#include "objects.h"
-#include "threads.h"
-
-#include <time.h>
-#include <signal.h>
-
-// for cpp
-#include <string>
-
-class ODAS
+AUDIO::AUDIO()
 {
-
-public:
-    ODAS(char);
-    ~ODAS();
-    void Start(std::string, char);
-    void Stop();
-    void GetData();
-
-    categories_obj *SafeODASData;
-    float energy_array[4];
-    float X_array[4];
-    float Y_array[4];
-    float freq_array[4];
-
-private:
-    objects *objs;
-    aobjects *aobjs;
-    configs *cfgs;
-    char debug;
-}
-
-ODAS(char mode)
-{
-    debug = mode;
     SafeODASData = (categories_obj *)malloc(sizeof(categories_obj));
     memset(SafeODASData, 0x00, sizeof(categories_obj));
 }
 
-ODAS::GetData()
+void AUDIO::GetData()
 {
     memccpy(SafeODASData, objs->snk_categories_object->in->categories, sizeof(categories_obj));
     //is this thread safe ?
@@ -58,7 +23,7 @@ ODAS::GetData()
     }
 }
 
-ODAS::Stop()
+void AUDIO::Stop()
 {
     if (debug == 0x01)
         printf("| + Stopping Threads................. ");
@@ -78,7 +43,7 @@ ODAS::Stop()
         printf("[Done] |\n");
 }
 
-ODAS::Start(std::string file_config)
+void AUDIO::Start(std::string file_config)
 {
 
     if (file_config == NULL)

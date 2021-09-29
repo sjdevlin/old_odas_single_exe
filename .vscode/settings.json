@@ -2,5 +2,6 @@
     "files.associations": {
         "snk_categories.h": "c",
         "type_traits": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "Enabled"
 }
