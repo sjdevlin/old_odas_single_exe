@@ -8,22 +8,26 @@ AUDIO::AUDIO()
 
 void AUDIO::GetData()
 {
-    memccpy(SafeODASData, objs->snk_categories_object->in->categories, sizeof(categories_obj));
+    SafeODASData->nSignals = objs->snk_categories_object->in->categories->nSignals; // need to optimise here lots of waste
+    memcpy(SafeODASData->energy_array, objs->snk_categories_object->in->categories->energy_array, sizeof(float) * SafeODASData->nSignals);
+    memcpy(SafeODASData->X_array, objs->snk_categories_object->in->categories->X_array, sizeof(float) * SafeODASData->nSignals);
+    memcpy(SafeODASData->Y_array, objs->snk_categories_object->in->categories->Y_array, sizeof(float) * SafeODASData->nSignals);
+    memcpy(SafeODASData->freq_array, objs->snk_categories_object->in->categories->freq_array, sizeof(float) * SafeODASData->nSignals);
     //is this thread safe ?
 
     for (int i = 0; i++; i < SafeODASData->nSignals)
     {
-        energy_array[i] = SafeODASData->energy_array + i;
-        X_array[i] = SafeODASData->X_array + i;
-        Y_array[i] = SafeODASData->X_array + i;
-        freq_array[i] = SafeODASData->freq_array + i
+        energy_array[i] = SafeODASData->energy_array[i];
+        X_array[i] = SafeODASData->X_array[i];
+        Y_array[i] = SafeODASData->X_array[i];
+        freq_array[i] = SafeODASData->freq_array[i];
 
-    if (debug == 0x01)
+    if (debug_mode == 0x01)
         printf("Odas data [%d]: E[%1.1f],X[%1.2f],Y[%1.2f],f[%3.0f]\n", i, energy_array[i], X_array[i], Y_array[i], freq_array[i]);
     }
 }
 
-void AUDIO::Stop()
+void AUDIO::Stop(char * file_config)
 {
     if (debug == 0x01)
         printf("| + Stopping Threads................. ");
@@ -43,7 +47,7 @@ void AUDIO::Stop()
         printf("[Done] |\n");
 }
 
-void AUDIO::Start(std::string file_config)
+void AUDIO::Start(char * file_config)
 {
 
     if (file_config == NULL)

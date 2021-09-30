@@ -22,8 +22,8 @@ class AUDIO
 public:
     AUDIO();
     ~AUDIO();
-    void Start(std::string, char);
-    void Stop();
+    void Start(char *);
+    void Stop(char *);
     void GetData();
 
     float energy_array[4];

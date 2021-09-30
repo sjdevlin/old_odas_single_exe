@@ -9,6 +9,7 @@
 
 #include <math.h>
 #include <time.h>
+#include "audio.h"
 
 #define MAXPART 8
 #define MAXSILENCE 500

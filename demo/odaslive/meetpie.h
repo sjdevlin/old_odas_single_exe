@@ -24,8 +24,6 @@
 #define SHAREOFVOICE 1
 #define DEBUG 2
 
-
-
 class MEETPIE
 {
 
@@ -33,21 +31,22 @@ public:
     MEETPIE();
     ~MEETPIE();
     void Update(MEETING);
+    void WriteToFile(MEETING);
+    bool ButtonPressed(uint16_t);
 
     int mode;
+    const uint16_t start_stop_pin;
+    const uint16_t mode_pin;
 
 private:
+    matrix_hal::MatrixIOBus matrix_bus;
+    matrix_hal::GPIOControl matrix_gpio;
+    matrix_hal::EverloopImage matrix_image1d;
+    matrix_hal::Everloop matrix_everloop;
 
-matrix_hal::MatrixIOBus matrix_bus;
-matrix_hal::GPIOControl matrix_gpio;
-matrix_hal::EverloopImage matrix_image1d;
-matrix_hal::Everloop matrix_everloop;
-
-const int mode_list[MAXMODES];
-const uint16_t GPIOInputMode;
-const uint16_t start_stop_pin;
-const uint16_t mode_pin;
-const int num_leds; // should be 16 bit ?
+    const int mode_list[MAXMODES];
+    const uint16_t GPIOInputMode;
+    const int num_leds; // should be 16 bit ?
 };
 
 #endif

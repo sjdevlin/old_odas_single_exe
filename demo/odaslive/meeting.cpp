@@ -1,6 +1,7 @@
 
-#include "audio.h"
 #include "meeting.h"
+
+MEETING::MEETING() {}
 
 void MEETING::Initialize()
 {
@@ -97,14 +98,10 @@ void MEETING::ProcessLatestData(AUDIO odas_obj)
             else // its an existing talker we're hearing
             {
                 // could put logic in here to count turns
-                participant_data_array[participant_at_angle[target_angle]].participant_is_talking = 1;
-                participant_data_array[participant_at_angle[target_angle]].participant_total_talk_time++;
+                participant[participant_at_angle[target_angle]].is_talking = 1;
+                participant[participant_at_angle[target_angle]].total_talk_time++;
                 ++num_talking; // another person is talking in this session
 
-                //				if (odas_data_array[iChannel].frequency > 0.0)
-                //				{
-                //					participant_data_array[participant_at_angle[target_angle]].participant_frequency = (0.9 * participant_data_array[participant_at_angle[target_angle]].participant_frequency) + (0.1 * odas_data_array[iChannel].frequency);
-                //				}
             }
         }
         else
