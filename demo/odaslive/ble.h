@@ -17,22 +17,22 @@ class BLE
 public:
     BLE();
     ~BLE();
-    int Start();
-    void Stop();
-    void Update(MEETING);
-    const static void * dataGetter(const char *);
-    static int dataSetter(const char *, const void *);
+    int start();
+    void stop();
+    void update(MEETING);
+    const static void * data_getter(const char *);
+    static int data_setter(const char *, const void *);
 
     //mutex so that we can multi-thread
     static std::mutex mutex_buffer;
     // The battery level ("battery/level") reported by the server (see Server.cpp)
-    static uint8_t serverDataBatteryLevel;
+    static uint8_t server_data_battery_level;
     // The text string ("text/string") used by our custom text string service (see Server.cpp)
-    static std::string serverDataTextString;
+    static std::string server_data_text_String;
 
 private:
     // Maximum time to wait for any single async process to timeout during initialization
-    static int kMaxAsyncInitTimeoutMS;
+    static int max_async_init_timeout_ms;
 };
 
 #endif

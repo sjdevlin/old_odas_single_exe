@@ -6,128 +6,128 @@
 BLE::BLE()
 {
     // Maximum time to wait for any single async process to timeout during initialization
-kMaxAsyncInitTimeoutMS = 30 * 1000;
+max_async_init_timeout_ms = 30 * 1000;
 // The battery level ("battery/level") reported by the server (see Server.cpp)
-serverDataBatteryLevel = 100  // for now we dont actually support real time batter;
+server_data_battery_level = 100  // for now we dont actually support real time batter;
 }
 
-const void * BLE::dataGetter(const char *pName)
+const void * BLE::data_getter(const char *p_name)
 {
 
-	if (nullptr == pName)
+	if (nullptr == p_name)
 	{
 		printf("NULL name sent to server data getter");
 		return nullptr;
 	}
 
-	std::string strName = pName;
+	std::string str_name = p_name;
 
-	if (strName == "battery/level")
+	if (str_name == "battery/level")
 	{
-		return &serverDataBatteryLevel;
+		return &server_data_battery_level;
 	}
-	else if (strName == "text/string")
+	else if (str_name == "text/string")
 	{
 
-		return serverDataTextString.c_str();
+		return server_data_text_String.c_str();
 	}
 
-	printf((std::string("Unknown name for server data getter request: '") + pName + "'").c_str());
+	printf((std::string("Unknown name for server data getter request: '") + p_name + "'").c_str());
 	return nullptr;
 }
 
-int BLE::dataSetter(const char *pName, const void *pData)
+int BLE::data_setter(const char *p_name, const void *p_data)
 {
 
-    if (nullptr == pName)
+    if (nullptr == p_name)
     {
         printf("NULL name sent to server data setter");
         return 0;
     }
-    if (nullptr == pData)
+    if (nullptr == p_data)
     {
-        printf("NULL pData sent to server data setter");
+        printf("NULL p_data sent to server data setter");
         return 0;
     }
 
-    std::string strName = pName;
+    std::string str_name = p_name;
 
-    if (strName == "mode")
+    if (str_name == "mode")
     {
-        std::string blemode = static_cast<const char *>(pData);
-        printf((std::string("Server data: mode set to '") + blemode + "'").c_str());
+        std::string ble_mode = static_cast<const char *>(p_data);
+        printf((std::string("Server data: mode set to '") + ble_mode + "'").c_str());
         return 1;
     }
 
-    printf((std::string("Unknown name for server data setter request: '") + pName + "'").c_str());
+    printf((std::string("Unknown name for server data setter request: '") + p_name + "'").c_str());
 
     return 0;
 }
 
-int BLE::Start()
+int BLE::start()
 {
         // Start Bluetooth
-    if (!ggkStart("gobbledegook", "Gobbledegook", "Gobbledegook", this->dataGetter, this->dataSetter, kMaxAsyncInitTimeoutMS))
+    if (!ggkStart("gobbledegook", "Gobbledegook", "Gobbledegook", this->data_getter, this->data_setter, max_async_init_timeout_ms))
         return -1;
 
 }
 
 
-void BLE::Stop()
+void BLE::stop()
 {
     ggkShutdownAndWait();
 
 }
 
-void BLE::Update(MEETING Meeting_Obj) 
+void BLE::update(MEETING meeting_obj) 
 {
             // now create the JSON for BLE
 
             	mutex_buffer.lock();
 
-			serverDataTextString = "{\"tMT\": ";
-			serverDataTextString += std::to_string(Meeting_Obj.total_meeting_time);
-			serverDataTextString += ",\"m\": [";
+			server_data_text_String = "{\"tMT\": ";
+			server_data_text_String += std::to_string(meeting_obj.total_meeting_time);
+			server_data_text_String += ",\"m\": [";
 
 			for (int i = 1; i < MAXPART; i++)
 			{
-				serverDataTextString += "[";
-				serverDataTextString += std::to_string(Meeting_Obj.participant[i].angle);
-				serverDataTextString += ",";
-				serverDataTextString += std::to_string(Meeting_Obj.participant[i].is_talking);
-				serverDataTextString += ",";
-				serverDataTextString += std::to_string(Meeting_Obj.participant[i].num_turns);
-				serverDataTextString += ",";
-				serverDataTextString += std::to_string(Meeting_Obj.participant[i].total_talk_time);
-				serverDataTextString += "]";
+				server_data_text_String += "[";
+				server_data_text_String += std::to_string(meeting_obj.participant[i].angle);
+				server_data_text_String += ",";
+				server_data_text_String += std::to_string(meeting_obj.participant[i].is_talking);
+				server_data_text_String += ",";
+				server_data_text_String += std::to_string(meeting_obj.participant[i].num_turns);
+				server_data_text_String += ",";
+				server_data_text_String += std::to_string(meeting_obj.participant[i].total_talk_time);
+				server_data_text_String += "]";
 
-                // logic to calc turns 
+ 				// logic to calc turns 
 
-				if (Meeting_Obj.participant[i].is_talking == 1 && Meeting_Obj.num_talking == 1) 
+				if (meeting_obj.participant[i].is_talking == 1 && meeting_obj.num_talking == 1) 
 				{
-					if (Meeting_Obj.last_talker!=i) // its a change of turn
+					if(meeting_obj.last_talker!=i) // its a change of turn
 					{
-						++Meeting_Obj.participant[i].num_turns;
-						Meeting_Obj.last_talker = i;
+						++meeting_obj.participant[i].num_turns;
+						meeting_obj.last_talker = i;
 					}
 				}
 
-				Meeting_Obj.participant[i].is_talking = 0; // set everyone to not talking
+				meeting_obj.participant[i].is_talking = 0; // set everyone to not talking
                 // end of new turn logic
 
 				if (i < MAXPART-1)
 				{
-					serverDataTextString += ",";
+					server_data_text_String += ",";
 				}
 			}
 
-			serverDataTextString += "]}\n";
+			server_data_text_String += "]}\n";
 
 			mutex_buffer.unlock();
 
-		    if (debug_mode == 0x01) printf ("Bluetooth data: %s\n",serverDataTextString.c_str());
+		    if (debug_mode == 0x01) printf ("Bluetooth data: %s\n",server_data_text_String.c_str());
 
-    		// now the output string is ready and we should call notify
+    		// now the output string is ready and_swe should call notify
 			ggkNofifyUpdatedCharacteristic("/com/gobbledegook/text/string");
 
 }

@@ -26,8 +26,8 @@ class MEETING
 public:
 MEETING ();
 ~MEETING ();
-void Initialize();
-void ProcessLatestData(AUDIO);
+void initialize();
+void process_latest_data(AUDIO);
 
 
 struct participant_data{

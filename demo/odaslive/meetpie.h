@@ -30,9 +30,9 @@ class MEETPIE
 public:
     MEETPIE();
     ~MEETPIE();
-    void Update(MEETING);
-    void WriteToFile(MEETING);
-    bool ButtonPressed(uint16_t);
+    void update(MEETING);
+    void write_to_file(MEETING);
+    bool button_pressed(uint16_t);
 
     int mode;
     const uint16_t start_stop_pin;
@@ -45,7 +45,7 @@ private:
     matrix_hal::Everloop matrix_everloop;
 
     const int mode_list[MAXMODES];
-    const uint16_t GPIOInputMode;
+    const uint16_t gpio_input_mode;
     const int num_leds; // should be 16 bit ?
 };
 

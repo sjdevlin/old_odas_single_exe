@@ -22,20 +22,20 @@ class AUDIO
 public:
     AUDIO();
     ~AUDIO();
-    void Start(char *);
-    void Stop(char *);
-    void GetData();
+    void start(char *);
+    void stop(char *);
+    void get_data();
 
     float energy_array[4];
-    float X_array[4];
-    float Y_array[4];
+    float x_array[4];
+    float y_array[4];
     float freq_array[4];
 
 private:
     objects *objs;
     aobjects *aobjs;
     configs *cfgs;
-    categories_obj *SafeODASData;
+    categories_obj *safe_odas_data;
     char debug;
 };
 

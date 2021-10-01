@@ -3,7 +3,7 @@
 
 MEETING::MEETING() {}
 
-void MEETING::Initialize()
+void MEETING::initialize()
 {
     int i;
     // initialise meeting array
@@ -29,7 +29,7 @@ void MEETING::Initialize()
     num_talking = 0;
 }
 
-void MEETING::ProcessLatestData(AUDIO odas_obj)
+void MEETING::process_latest_data(AUDIO odas_obj)
 {
 
     int target_angle, iChannel, iAngle;
@@ -42,10 +42,10 @@ void MEETING::ProcessLatestData(AUDIO odas_obj)
     {
         //  dont use energy to check if track is active otherwise you miss the ending of the speech and
         //  participant talking is never set to false
-        if (odas_obj.X_array[iChannel] != 0.0 && odas_obj.Y_array[iChannel] != 0.0)
+        if (odas_obj.x_array[iChannel] != 0.0 && odas_obj.y_array[iChannel] != 0.0)
         {
             total_silence = 0; // consider moving this
-            target_angle = 180 - (atan2(odas_obj.X_array[iChannel], odas_obj.X_array[iChannel]) * 57.3);
+            target_angle = 180 - (atan2(odas_obj.x_array[iChannel], odas_obj.y_array[iChannel]) * 57.3);
 
             // participant_at_angle holds a int for every angle position.  Once an angle is set to true a person is registered there
             // so if tracked source is picked up we check to see if it is coming from a known participant
