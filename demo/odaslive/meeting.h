@@ -36,13 +36,15 @@ struct participant_data{
     int silent_time;
     int total_talk_time;
     int num_turns;
-    float frequency;
+    int share_of_voice;  // as inetger percentage
+    float frequency;  // should this be int ?
  };
 
     int participant_at_angle[360];
     int num_participants;
     int total_silence;
     int total_meeting_time;
+    int total_talk_time;
     int last_talker;
     int num_talking;
     struct participant_data participant[MAXPART];

@@ -198,13 +198,14 @@ target_link_libraries(odas
 )
 
 add_executable(meetpie
+    demo/odaslive/main2.cpp
     demo/odaslive/meetpie.cpp
     demo/odaslive/meeting.cpp
     demo/odaslive/audio.cpp
+    demo/odaslive/ble.cpp
     demo/odaslive/configs.c
     demo/odaslive/objects.c
     demo/odaslive/parameters.c
-    demo/odaslive/profiler.c
     demo/odaslive/threads.c
 )
 target_link_libraries(meetpie

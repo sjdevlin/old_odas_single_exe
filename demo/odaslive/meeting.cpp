@@ -14,6 +14,7 @@ void MEETING::initialize()
         participant[i].silent_time = 0;
         participant[i].total_talk_time = 0;
         participant[i].num_turns = 0;
+        participant[i].share_of_voice = 0;
         participant[i].frequency = 0.0;
     }
 
@@ -24,6 +25,7 @@ void MEETING::initialize()
 
     total_silence = 0;
     total_meeting_time = 0;
+    total_talk_time = 0;
     num_participants = 0;
     last_talker = 0;
     num_talking = 0;
@@ -100,6 +102,7 @@ void MEETING::process_latest_data(AUDIO odas_obj)
                 // could put logic in here to count turns
                 participant[participant_at_angle[target_angle]].is_talking = 1;
                 participant[participant_at_angle[target_angle]].total_talk_time++;
+                ++total_talk_time;
                 ++num_talking; // another person is talking in this session
 
             }
@@ -107,7 +110,7 @@ void MEETING::process_latest_data(AUDIO odas_obj)
         else
         {
             prospective_source[iChannel] = 0;
-            total_silence++;
+            ++total_silence;
         }
     }
 }

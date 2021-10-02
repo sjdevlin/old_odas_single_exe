@@ -35,8 +35,8 @@ public:
     bool button_pressed(uint16_t);
 
     int mode;
-    const uint16_t start_stop_pin;
-    const uint16_t mode_pin;
+    uint16_t start_stop_pin;
+    uint16_t mode_pin;
 
 private:
     matrix_hal::MatrixIOBus matrix_bus;
@@ -44,9 +44,9 @@ private:
     matrix_hal::EverloopImage matrix_image1d;
     matrix_hal::Everloop matrix_everloop;
 
-    const int mode_list[MAXMODES];
-    const uint16_t gpio_input_mode;
-    const int num_leds; // should be 16 bit ?
+    int mode_list[MAXMODES];
+    uint16_t gpio_input_mode;
+    int num_leds; // should be 16 bit ?
 };
 
 #endif

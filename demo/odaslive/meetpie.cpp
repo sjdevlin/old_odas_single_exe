@@ -5,19 +5,24 @@
 MEETPIE::MEETPIE()
 {
 
-    matrix_bus = new matrix_hal::MatrixIOBus;
-    if (!matrix_bus.Init())
-        return false;
+    mode_list = [DARK, SHAREOFVOICE, DEBUG ];
+    gpio_input_mode = 0;   // input
+    start_stop_pin = 0;  // GPIO 0
+    mode_pin = 1;        //GPIO 1
+    mode = SHAREOFVOICE; // default mode
 
-    matrix_gpio = new matrix_hal::GPIOControl;
+    matrix_hal::MatrixIOBus matrix_bus;
+    matrix_bus.Init();
+    matrix_hal::GPIOControl matrix_gpio;
     matrix_gpio.Setup(&matrix_bus);
-    matrix_gpio.SetMode(start_stop_pin, GPIOInputMode);
-    matrix_gpio.SetMode(mode_pin, GPIOInputMode);
+    matrix_gpio.SetMode(start_stop_pin, gpio_input_mode);
+    matrix_gpio.SetMode(mode_pin, gpio_input_mode);
 
-    matrix_image1d = new matrix_hal::EverloopImage(matrix_bus.MatrixLeds());
+    matrix_hal::EverloopImage(matrix_bus.MatrixLeds()) matrix_image1d;
     matrix_everloop = new matrix_hal::Everloop;
     matrix_everloop.Setup(&matrix_bus);
 
+    num_leds = matrix_image1d.leds.size();
     // switch off all the LEDs
 
     for (matrix_hal::LedValue &led : matrix_image1d.leds)
@@ -28,17 +33,11 @@ MEETPIE::MEETPIE()
         led.white = 0;
     }
 
-    mode_list[MAXMODES] = [ DARK, SHAREOFVOICE, DEBUG ];
-    gpio_input_mode = 0;   // input
-    start_stop_pin = 0;  // GPIO 0
-    mode_pin = 1;        //GPIO 1
-    mode = SHAREOFVOICE; // default mode
-
-    num_leds = image1d.leds.size();
 }
 
 void MEETPIE::update(MEETING meeting_obj)
 {
+
     switch (mode)
     {
     case DEBUG:
