@@ -5,7 +5,7 @@
 MEETPIE::MEETPIE()
 {
 
-    mode_list = [DARK, SHAREOFVOICE, DEBUG ];
+    mode = 0;
     gpio_input_mode = 0;   // input
     start_stop_pin = 0;  // GPIO 0
     mode_pin = 1;        //GPIO 1
@@ -84,7 +84,7 @@ void MEETPIE::write_to_file(MEETING meeting_obj)
         std::ofstream file(filename);
         //	std::cin >> buffer;
 
-			text_line = std::to_string(meeting_obj.total_meeting_time)
+			text_line = std::to_string(meeting_obj.total_meeting_time);
 
 			for (int i = 1; i < MAXPART; i++)
 			{

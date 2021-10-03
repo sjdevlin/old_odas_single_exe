@@ -16,7 +16,6 @@ class BLE
 
 public:
     BLE();
-    ~BLE();
     bool start();
     void stop();
     void update(MEETING);

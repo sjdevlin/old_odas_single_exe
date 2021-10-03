@@ -1,12 +1,14 @@
 #ifndef audio_h
 #define audio_h
 
+extern "C" {
 #include "../../include/odas/odas.h"
 
 #include "parameters.h"
 #include "configs.h"
 #include "objects.h"
 #include "threads.h"
+}
 
 #include <time.h>
 #include <signal.h>
@@ -21,7 +23,6 @@ class AUDIO
 
 public:
     AUDIO();
-    ~AUDIO();
     void start(char *);
     void stop(char *);
     void get_data();

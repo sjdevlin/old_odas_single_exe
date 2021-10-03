@@ -17,7 +17,7 @@
 #define RUNNING 0x03
 
 char debug_mode = 0x00; // global variable for debugging flag
-char shutdown = 0x00;   // Used in signal handler for orderly shut down on Ctrl C
+char shutdown_request = 0x00;   // Used in signal handler for orderly shut down on Ctrl C
 
 void signal_handler(int signum)
 {
@@ -25,11 +25,11 @@ void signal_handler(int signum)
     {
     case SIGINT:
         printf("SIGINT recieved, shutting down");
-        shutdown = 0x01;
+        shutdown_request = 0x01;
         break;
     case SIGTERM:
         printf("SIGTERM recieved, shutting down");
-        shutdown = 0x01;
+        shutdown_request = 0x01;
         break;
     }
 }
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    while (shutdown != 0x01)
+    while (shutdown_request != 0x01)
     {
         switch (status)
         {
@@ -143,14 +143,8 @@ int main(int argc, char *argv[])
 
     // stop threads and clean up audio objects
     audio_obj.stop(file_config);
-    audio_obj.~AUDIO();
-
  
-    meeting_obj.~MEETING();
-    meetpie_obj.~MEETPIE();
-
     ble_obj.stop();
-    ble_obj.~BLE();
-
+ 
     exit(0);
 }

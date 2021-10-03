@@ -9,6 +9,8 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(PC_FFTW3 REQUIRED fftw3f)
 pkg_check_modules(PC_ALSA REQUIRED alsa)
 pkg_check_modules(PC_LIBCONFIG REQUIRED libconfig)
+find_library (MATRIX_CREATOR_HAL matrix_creator_hal)
+
 
 include_directories("${PROJECT_SOURCE_DIR}/include")
 
@@ -192,9 +194,10 @@ add_library(odas SHARED
 target_link_libraries(odas
 	${PC_FFTW3_LIBRARIES}
 	${PC_ALSA_LIBRARIES}
-    ${PC_LIBCONFIG_LIBRARIES}
+    	${PC_LIBCONFIG_LIBRARIES}
+	${MATRIX_CREATOR_HAL}
 	m
-    pthread
+    	pthread
 )
 
 add_executable(meetpie

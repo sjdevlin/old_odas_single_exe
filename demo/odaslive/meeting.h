@@ -25,7 +25,6 @@ class MEETING
 {
 public:
 MEETING ();
-~MEETING ();
 void initialize();
 void process_latest_data(AUDIO);
 
