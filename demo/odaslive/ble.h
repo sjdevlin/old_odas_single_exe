@@ -17,7 +17,7 @@ class BLE
 public:
     BLE();
     ~BLE();
-    int start();
+    bool start();
     void stop();
     void update(MEETING);
     const static void * data_getter(const char *);

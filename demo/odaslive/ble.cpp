@@ -64,11 +64,11 @@ int BLE::data_setter(const char *p_name, const void *p_data)
     return 0;
 }
 
-int BLE::start()
+bool BLE::start()
 {
         // Start Bluetooth
     if (!ggkStart("gobbledegook", "Gobbledegook", "Gobbledegook", this->data_getter, this->data_setter, max_async_init_timeout_ms))
-        return -1;
+        return false;
 
 }
 

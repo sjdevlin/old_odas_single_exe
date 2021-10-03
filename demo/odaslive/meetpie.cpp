@@ -11,6 +11,11 @@ MEETPIE::MEETPIE()
     mode_pin = 1;        //GPIO 1
     mode = SHAREOFVOICE; // default mode
 
+    int red[MAXPART] = {200,0,0,100,0,100,100};
+    int green[MAXPART] = {0,200,0,100,100,0,50};
+    int blue[MAXPART] = {0,0,150,0,100,100,50};
+
+
     matrix_hal::MatrixIOBus matrix_bus;
     matrix_bus.Init();
     matrix_hal::GPIOControl matrix_gpio;
@@ -18,8 +23,8 @@ MEETPIE::MEETPIE()
     matrix_gpio.SetMode(start_stop_pin, gpio_input_mode);
     matrix_gpio.SetMode(mode_pin, gpio_input_mode);
 
-    matrix_hal::EverloopImage(matrix_bus.MatrixLeds()) matrix_image1d;
-    matrix_everloop = new matrix_hal::Everloop;
+    matrix_hal::EverloopImage matrix_image1d = matrix_hal::EverloopImage(matrix_bus.MatrixLeds()) ;
+    matrix_hal::Everloop matrix_everloop;
     matrix_everloop.Setup(&matrix_bus);
 
     num_leds = matrix_image1d.leds.size();
@@ -47,9 +52,9 @@ void MEETPIE::update(MEETING meeting_obj)
             if (meeting_obj.participant[i].is_talking == 1)
             {
                 int led_talker = meeting_obj.participant[i].angle * num_leds / 360;
-                image1d.leds[led_talker].red = red[i];
-                image1d.leds[led_talker].green = green[i];
-                image1d.leds[led_talker].blue = blue[i];
+                matrix_image1d.leds[led_talker].red = red[i];
+                matrix_image1d.leds[led_talker].green = green[i];
+                matrix_image1d.leds[led_talker].blue = blue[i];
             }
         }
         break;

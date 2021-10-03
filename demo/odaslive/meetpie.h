@@ -44,6 +44,7 @@ private:
     matrix_hal::EverloopImage matrix_image1d;
     matrix_hal::Everloop matrix_everloop;
 
+    int red[MAXPART], blue[MAXPART], green[MAXPART];
     int mode_list[MAXMODES];
     uint16_t gpio_input_mode;
     int num_leds; // should be 16 bit ?
