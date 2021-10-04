@@ -3,12 +3,15 @@
 
 //  Main Class Methods for the Meet Pie Device
 
+// These static variables have to initilized outside of the constructor
+// battery level ("battery/level") reported by the server (see Server.cpp)
+uint8_t BLE::server_data_battery_level = 100;
+std::mutex BLE::mutex_buffer;
+std::string BLE::server_data_text_String = "";
+
+
 BLE::BLE()
 {
-    // Maximum time to wait for any single async process to timeout during initialization
-max_async_init_timeout_ms = 30 * 1000;
-// The battery level ("battery/level") reported by the server (see Server.cpp)
-server_data_battery_level = 100;  // for now we dont actually support real time batter;
 }
 
 const void * BLE::data_getter(const char *p_name)
@@ -69,9 +72,12 @@ bool BLE::start()
         // Start Bluetooth
     if (!ggkStart("gobbledegook", "Gobbledegook", "Gobbledegook", this->data_getter, this->data_setter, max_async_init_timeout_ms))
 	{
-        return 0;}
-else
-	{return 1;}
+        return 0;
+	}
+	else
+	{
+	return 1;
+	}
 
 }
 

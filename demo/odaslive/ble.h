@@ -19,7 +19,7 @@ public:
     bool start();
     void stop();
     void update(MEETING);
-    const static void * data_getter(const char *);
+    static const void * data_getter(const char *);
     static int data_setter(const char *, const void *);
 
     //mutex so that we can multi-thread
@@ -28,10 +28,10 @@ public:
     static uint8_t server_data_battery_level;
     // The text string ("text/string") used by our custom text string service (see Server.cpp)
     static std::string server_data_text_String;
+    static const int max_async_init_timeout_ms = 3000;
 
 private:
     // Maximum time to wait for any single async process to timeout during initialization
-    static int max_async_init_timeout_ms;
 };
 
 #endif
