@@ -46,8 +46,10 @@
         format_obj * format;
         interface_obj * interface;
 
-        char * buffer;
-        unsigned int bufferSize;
+//        char * buffer;
+//        unsigned int bufferSize;
+//      sd for meet pie put a safe copy of category sink date here
+        categories_obj * safe_buffer;
 
         FILE * fp;
 

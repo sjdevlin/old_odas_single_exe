@@ -1,7 +1,4 @@
 {
-    "files.associations": {
-        "snk_categories.h": "c",
-        "type_traits": "cpp"
-    },
-    "C_Cpp.errorSquiggles": "Enabled"
+    "C_Cpp.default.configurationProvider": "ms-vsvode.cmake-tools",
+    "files.associations": {"type_traits":"cpp"}
 }

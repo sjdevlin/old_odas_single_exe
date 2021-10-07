@@ -34,22 +34,11 @@
         obj->nChannels = msg_categories_config->nChannels;
         obj->fS = snk_categories_config->fS;
         
-        obj->format = format_clone(snk_categories_config->format);
-        obj->interface = interface_clone(snk_categories_config->interface);
-
-        if (!(((obj->interface->type == interface_blackhole)  && (obj->format->type == format_undefined)) ||
-              ((obj->interface->type == interface_file)  && (obj->format->type == format_text_json)) ||
-              ((obj->interface->type == interface_socket) && (obj->format->type == format_text_json)) ||
-              ((obj->interface->type == interface_terminal) && (obj->format->type == format_text_json)))) {
-            
-            printf("Sink categories: Invalid interface and/or format.\n");
-            exit(EXIT_FAILURE);
-
-        }
-
-        obj->buffer = (char *) malloc(sizeof(char) * 1024);
-        memset(obj->buffer, 0x00, sizeof(char) * 1024);
-        obj->bufferSize = 0;
+        obj->safe_buffer = (categories_obj *) malloc(sizeof(categories_obj));
+        obj->safe_buffer->energy_array = (float *) malloc(sizeof(float) * msg_categories_config->nChannels);
+        obj->safe_buffer->X_array = (float *) malloc(sizeof(float) * msg_categories_config->nChannels);
+        obj->safe_buffer->Y_array = (float *) malloc(sizeof(float) * msg_categories_config->nChannels);
+        obj->safe_buffer->freq_array = (float *) malloc(sizeof(float) * msg_categories_config->nChannels);
 
         obj->in = (msg_categories_obj *) NULL;
 
@@ -62,7 +51,10 @@
         format_destroy(obj->format);
         interface_destroy(obj->interface);
 
-        free((void *) obj->buffer);
+        free((void *) obj->safe_buffer->energy_array);
+        free((void *) obj->safe_buffer->X_array);
+        free((void *) obj->safe_buffer->Y_array);
+        free((void *) obj->safe_buffer->freq_array);
 
         free((void *) obj);
 
@@ -82,147 +74,14 @@
 
     void snk_categories_open(snk_categories_obj * obj) {
 
-        switch(obj->interface->type) {
-
-            case interface_blackhole:
-
-                snk_categories_open_interface_blackhole(obj);
-
-            break;
-
-            case interface_file:
-
-                snk_categories_open_interface_file(obj);
-
-            break;
-
-            case interface_socket:
-
-                snk_categories_open_interface_socket(obj);
-
-            break;
-
-            case interface_terminal:
-
-                snk_categories_open_interface_terminal(obj);
-
-            break;
-
-            default:
-
-                printf("Sink categories: Invalid interface type.\n");
-                exit(EXIT_FAILURE);
-
-            break;           
-
-        }
-
+    
+    
     }
-
-    void snk_categories_open_interface_blackhole(snk_categories_obj * obj) {
-
-        // Empty
-
-    }
-
-    void snk_categories_open_interface_file(snk_categories_obj * obj) {
-
-        obj->fp = fopen(obj->interface->fileName, "wb");
-
-        if (obj->fp == NULL) {
-            printf("Cannot open file %s\n",obj->interface->fileName);
-            exit(EXIT_FAILURE);
-        }        
-
-    }
-
-    void snk_categories_open_interface_socket(snk_categories_obj * obj) {
-
-        memset(&(obj->sserver), 0x00, sizeof(struct sockaddr_in));
-
-        obj->sserver.sin_family = AF_INET;
-        obj->sserver.sin_addr.s_addr = inet_addr(obj->interface->ip);
-        obj->sserver.sin_port = htons(obj->interface->port);
-        obj->sid = socket(AF_INET, SOCK_DGRAM, 0);
-
-// sd changed to use UDP
- //       if ( (bind(obj->sid, (struct sockaddr *) &(obj->sserver), sizeof(obj->sserver))) < 0 ) {
-
-   //         printf("Sink categories: Cannot connect to server\n");
-     //       exit(EXIT_FAILURE);
-
-       // }          
-
-    }
-
-    void snk_categories_open_interface_terminal(snk_categories_obj * obj) {
-
-        // Empty
-
-    }  
+ 
 
     void snk_categories_close(snk_categories_obj * obj) {
 
-        switch(obj->interface->type) {
-
-            case interface_blackhole:
-
-                snk_categories_close_interface_blackhole(obj);
-
-            break;
-
-            case interface_file:
-
-                snk_categories_close_interface_file(obj);
-
-            break;
-
-            case interface_socket:
-
-                snk_categories_close_interface_socket(obj);
-
-            break;
-
-            case interface_terminal:
-
-                snk_categories_close_interface_terminal(obj);
-
-            break;
-
-            default:
-
-                printf("Sink categories: Invalid interface type.\n");
-                exit(EXIT_FAILURE);
-
-            break;
-
         }
-
-    }
-
-    void snk_categories_close_interface_blackhole(snk_categories_obj * obj) {
-
-        // Empty
-
-    }
-
-    void snk_categories_close_interface_file(snk_categories_obj * obj) {
-
-        fclose(obj->fp);
-
-    }
-
-    void snk_categories_close_interface_socket(snk_categories_obj * obj) {
-
-        close(obj->sid);
-
-    }
-
-    void snk_categories_close_interface_terminal(snk_categories_obj * obj) {
-
-        // Empty
-
-    }
 
     int snk_categories_process(snk_categories_obj * obj) {
 
@@ -232,147 +91,16 @@
 
             if (obj->in->timeStamp%100 == 0) {
 
-            switch(obj->format->type) {
-
-                case format_text_json:
-
-                    snk_categories_process_format_text_json(obj);
-
-                break;
-
-                case format_undefined:                
-
-                    snk_categories_process_format_undefined(obj);
-
-                break;
-
-                default:
-
-                    printf("Sink categories: Invalid format type.\n");
-                    exit(EXIT_FAILURE);
-
-                break;
-
-            }
-
-            switch(obj->interface->type) {
-
-                case interface_blackhole:
-
-                    snk_categories_process_interface_blackhole(obj);
-
-                break;  
-
-                case interface_file:
-
-                    snk_categories_process_interface_file(obj);
-
-                break;
-
-                case interface_socket:
-
-                    snk_categories_process_interface_socket(obj);
-
-                break;
-
-                case interface_terminal:
-
-                    snk_categories_process_interface_terminal(obj);
-
-                break;
-
-                default:
-
-                    printf("Sink categories: Invalid interface type.\n");
-                    exit(EXIT_FAILURE);
-
-                break;
-
-            }
-
-            rtnValue = 0;
-        }
-        }
-        else {
-
-            rtnValue = -1;
+            memcpy(obj->safe_buffer->energy_array,obj->in->categories->energy_array, sizeof(float) * obj->nChannels);
+            memcpy(obj->safe_buffer->X_array,obj->in->categories->X_array, sizeof(float) * obj->nChannels);
+            memcpy(obj->safe_buffer->Y_array,obj->in->categories->Y_array, sizeof(float) * obj->nChannels);
+            memcpy(obj->safe_buffer->freq_array,obj->in->categories->freq_array, sizeof(float) * obj->nChannels);
 
         }
 
-        return rtnValue;
-
     }
 
-    void snk_categories_process_interface_blackhole(snk_categories_obj * obj) {
-
-        // Empty
-
-    }
-
-    void snk_categories_process_interface_file(snk_categories_obj * obj) {
-
-        fwrite(obj->buffer, sizeof(char), obj->bufferSize, obj->fp);
-
-    }
-
-    void snk_categories_process_interface_socket(snk_categories_obj * obj) {
-
-// sd changed to UDP
-        if (sendto(obj->sid, obj->buffer, obj->bufferSize, MSG_DONTWAIT, (struct sockaddr *) &(obj->sserver), sizeof(obj->sserver)) < 0) {
-            printf("Sink categories: Could not send message.\n");
-            exit(EXIT_FAILURE);
-        }
-//	printf("%s\n", obj->buffer);
-    }
-
-    void snk_categories_process_interface_terminal(snk_categories_obj * obj) {
-
-        printf("%s",obj->buffer);
-
-    }
-
-    void snk_categories_process_format_text_json(snk_categories_obj * obj) {
-
-        unsigned int iChannel;
-
-        obj->buffer[0] = 0x00;
-
-        sprintf(obj->buffer,"%s{\n",obj->buffer);
-        sprintf(obj->buffer,"%s    \"timeStamp\": %llu,\n",obj->buffer,obj->in->timeStamp);
-        sprintf(obj->buffer,"%s    \"src\": [\n",obj->buffer);
-
-        for (iChannel = 0; iChannel < obj->nChannels; iChannel++) {
-
-// sd changed to write out base frequency of each source
-            sprintf(obj->buffer,"%s        { \"activity\": %1.1f ,",obj->buffer, obj->in->categories->energy_array[iChannel]);
-            sprintf(obj->buffer,"%s \"x\": %1.3f ,",obj->buffer, obj->in->categories->X_array[iChannel]);
-            sprintf(obj->buffer,"%s \"y\": %1.3f ,",obj->buffer, obj->in->categories->Y_array[iChannel]);
-            sprintf(obj->buffer,"%s \"freq\": %3.0f }",obj->buffer, obj->in->categories->freq_array[iChannel]);
-            
-            if (iChannel != (obj->nChannels - 1)) {
-
-                sprintf(obj->buffer,"%s,",obj->buffer);
-
-            }
-
-            sprintf(obj->buffer,"%s\n",obj->buffer);
-
-        }
-        
-        sprintf(obj->buffer,"%s    ]\n",obj->buffer);
-        sprintf(obj->buffer,"%s}\n",obj->buffer);
-
-        obj->bufferSize = strlen(obj->buffer);
-
-    }
-
-    void snk_categories_process_format_undefined(snk_categories_obj * obj) {
-
-        obj->buffer[0] = 0x00;
-        obj->bufferSize = 0;
-
-    }
-
+}
     snk_categories_cfg * snk_categories_cfg_construct(void) {
 
         snk_categories_cfg * cfg;

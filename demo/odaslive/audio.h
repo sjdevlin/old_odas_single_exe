@@ -31,13 +31,9 @@ public:
     float x_array[4];
     float y_array[4];
     float freq_array[4];
-    categories_obj *safe_odas_data;
-
-private:
     objects *objs;
     aobjects *aobjs;
     configs *cfgs;
-    char debug;
 };
 
 #endif

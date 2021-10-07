@@ -29,7 +29,7 @@ class MEETPIE
 {
 
 public:
-    MEETPIE();
+    MEETPIE(uint16_t);
     void update(MEETING);
     void write_to_file(MEETING);
     bool button_pressed(uint16_t);
@@ -37,6 +37,7 @@ public:
     int mode;
     uint16_t start_stop_pin;
     uint16_t mode_pin;
+    uint16_t num_leds;
 
 private:
     matrix_hal::MatrixIOBus matrix_bus;
@@ -46,7 +47,7 @@ private:
 
     int red[MAXPART], blue[MAXPART], green[MAXPART];
     uint16_t gpio_input_mode;
-    int num_leds; // should be 16 bit ?
+
 };
 
 #endif

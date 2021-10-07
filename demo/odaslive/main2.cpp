@@ -15,6 +15,7 @@
 #define STOP 0x01
 #define START 0x02
 #define RUNNING 0x03
+#define NUMLEDS 18
 
 char debug_mode = 0x00; // global variable for debugging flag
 char shutdown_request = 0x00;   // Used in signal handler for orderly shut down on Ctrl C
@@ -39,7 +40,7 @@ int main(int argc, char *argv[])
     // Create objects
     AUDIO audio_obj;
     MEETING meeting_obj;
-    MEETPIE meetpie_obj;
+    MEETPIE meetpie_obj(NUMLEDS);
     BLE ble_obj;
 
     // Command-line parser  // need to add error condition
@@ -71,22 +72,22 @@ int main(int argc, char *argv[])
     char mode_pressed = 0x00;
 
     // start up bluetooth server
-    if (!ble_obj.start())
+/*    if (!ble_obj.start())
     {
         printf("error starting bluetooth");
         exit(0);
     }
-
+*/
     while (shutdown_request != 0x01)
     {
         switch (status)
         {
         case STOPPED:
-            while (meetpie_obj.button_pressed(meetpie_obj.start_stop_pin) == 1)
+            while (meetpie_obj.button_pressed(meetpie_obj.start_stop_pin))
             {
                 status = START;
             } // put in logic to stop repeating
-            while (meetpie_obj.button_pressed(meetpie_obj.mode_pin) == 1)
+            while (meetpie_obj.button_pressed(meetpie_obj.mode_pin))
             {
                 mode_pressed = 0x01;
             }
@@ -94,21 +95,24 @@ int main(int argc, char *argv[])
             {
                 meetpie_obj.mode = (meetpie_obj.mode < MAXMODES - 1) ? meetpie_obj.mode + 1 : 0;
                 mode_pressed = 0x00;
+                if (debug_mode == 0x01) printf ("Mode changed to %d\n",meetpie_obj.mode);
             }
-            sleep(.1);
+            sleep(1);
             break;
 
         case START:
+            printf ("starting odas\n");
             audio_obj.start(file_config);
+            printf("initializing meeting\n");
             meeting_obj.initialize();
-            printf("temporary wait to ensure all odas threads are running");
+            printf("temporary wait to ensure all odas threads are running\n");
             sleep(5);
             status = RUNNING;
             break;
 
         case RUNNING:
 
-            sleep(.5); // This is the crucial delay that determines frequnecy of polling
+            sleep(1); // This is the crucial delay that determines frequnecy of polling
             if (meetpie_obj.button_pressed(meetpie_obj.start_stop_pin) == 1)
                 status = STOP;
 

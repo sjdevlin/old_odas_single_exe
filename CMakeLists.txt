@@ -215,12 +215,12 @@ target_link_libraries(meetpie
 	${PC_ALSA_LIBRARIES}
     ${PC_LIBCONFIG_LIBRARIES}
 	m
-    pthread	
+    pthread
     glib-2.0
 	gio-2.0
 	gobject-2.0
 	${MATRIX_CREATOR_HAL}
-	/home/pi/ggk/gobbledegook/src/libggk.a
+	/home/pi/odas/lib/libggk.a
     libc.so.6
     libm.so.6
 
