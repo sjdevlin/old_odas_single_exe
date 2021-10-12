@@ -16,6 +16,8 @@ void MEETING::initialize()
         participant[i].num_turns = 0;
         participant[i].share_of_voice = 0;
         participant[i].frequency = 0.0;
+
+        participant_clockface[i]=0;
     }
 
     for (i = 0; i < 360; i++)
@@ -29,16 +31,17 @@ void MEETING::initialize()
     num_participants = 0;
     last_talker = 0;
     num_talking = 0;
+    start_time = time();
 }
 
-void MEETING::process_latest_data(AUDIO odas_obj)
+void MEETING::process_latest_data(AUDIO odas_obj, uint16_t polling_freq)
 {
 
     int target_angle, iChannel, iAngle;
     static int prospective_source[4] = {0, 0, 0, 0}; // not pretty but will work for now - assumes NUMCHANNELS <= 4
 
     num_talking = 0;
-    total_meeting_time++;
+    ++total_meeting_time;  // may not be needed eventually (as we have duration) but keeping for now
 
     for (iChannel = 0; iChannel < NUMCHANNELS; iChannel++)
     {
@@ -61,7 +64,7 @@ void MEETING::process_latest_data(AUDIO odas_obj)
                 if (++prospective_source[iChannel] > MINTALKTIME) // once they have talked for X secs we are more certain they are a member
                 {
 
-                    num_participants++;
+                    ++num_participants;
                     ++num_talking; // another person is talking in this session
                     participant_at_angle[target_angle] = num_participants;
                     participant[num_participants].angle = target_angle;
@@ -95,14 +98,31 @@ void MEETING::process_latest_data(AUDIO odas_obj)
                     }
 
                     participant[num_participants].is_talking = iChannel;
+                    participant[num_participants].led = participant[num_participants].angle * num_leds / 360;
+
+                    // now update the clockface
+                    int ang_order = 1;
+                    for (int i = 0 ; i <360; i=i+ANGLESPREAD)
+                    {
+                        if (meeting_obj.participant_at_angle[i]>0  && meeting_obj.participant_clockface[ang_order] != meeting_obj.participant_at_angle[i])
+                        {
+                            meeting_obj.participant_clockface[ang_order] = meeting_obj.participant_at_angle[i];
+                            ++ang_order;
+
+                        }
+                    }
+
+            }
+
+
                 }
             }
             else // its an existing talker we're hearing
             {
                 // could put logic in here to count turns
                 participant[participant_at_angle[target_angle]].is_talking = 1;
-                participant[participant_at_angle[target_angle]].total_talk_time++;
-                ++total_talk_time;
+                ++participant[participant_at_angle[target_angle]].total_talk_time;
+                if (num_talking ==1) ++total_talk_time; // check num_talking to avoid double counting talk time 
                 ++num_talking; // another person is talking in this session
 
             }

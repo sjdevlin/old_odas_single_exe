@@ -20,10 +20,6 @@
 //#include "../cpp/driver/imu_data.h"
 //#include "../cpp/driver/imu_sensor.h"
 
-#define MAXMODES 3
-#define DARK 0
-#define SHAREOFVOICE 1
-#define DEBUG 2
 
 class MEETPIE
 {
@@ -44,6 +40,10 @@ private:
     matrix_hal::GPIOControl matrix_gpio;
     matrix_hal::EverloopImage matrix_image1d;
     matrix_hal::Everloop matrix_everloop;
+
+    uint16_t* virtual_led_ring;
+    uint16_t closest_led[MAXPART];
+    uint16_t segment_led[MAXPART];
 
     int red[MAXPART], blue[MAXPART], green[MAXPART];
     uint16_t gpio_input_mode;

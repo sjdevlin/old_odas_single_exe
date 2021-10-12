@@ -15,7 +15,17 @@
 #define STOP 0x01
 #define START 0x02
 #define RUNNING 0x03
-#define NUMLEDS 18
+
+#define NUMLEDS 18  // eventually this will go into a parameter file
+#define POLLINGFREQ 1  // also this into a parameter file
+
+#define MAXMODES 3
+#define DARK 0
+#define SHAREOFVOICE 1
+#define DEBUG 2
+
+#define MAXPART 8
+
 
 char debug_mode = 0x00; // global variable for debugging flag
 char shutdown_request = 0x00;   // Used in signal handler for orderly shut down on Ctrl C
@@ -26,7 +36,7 @@ void signal_handler(int signum)
     {
     case SIGINT:
         printf("SIGINT recieved, shutting down");
-        shutdown_request = 0x01;
+        shutdown_request = 0x01; // JJ check this is OK
         break;
     case SIGTERM:
         printf("SIGTERM recieved, shutting down");
@@ -72,12 +82,12 @@ int main(int argc, char *argv[])
     char mode_pressed = 0x00;
 
     // start up bluetooth server
-/*    if (!ble_obj.start())
+    if (!ble_obj.start())
     {
         printf("error starting bluetooth");
         exit(0);
     }
-*/
+
     while (shutdown_request != 0x01)
     {
         switch (status)
@@ -97,23 +107,21 @@ int main(int argc, char *argv[])
                 mode_pressed = 0x00;
                 if (debug_mode == 0x01) printf ("Mode changed to %d\n",meetpie_obj.mode);
             }
-            sleep(1);
+            sleep(POLLINGFREQ);
             break;
 
         case START:
-            printf ("starting odas\n");
+
             audio_obj.start(file_config);
-            printf("initializing meeting\n");
             meeting_obj.initialize();
-            printf("temporary wait to ensure all odas threads are running\n");
-            sleep(5);
             status = RUNNING;
             break;
 
         case RUNNING:
 
-            sleep(1); // This is the crucial delay that determines frequnecy of polling
-            if (meetpie_obj.button_pressed(meetpie_obj.start_stop_pin) == 1)
+            sleep(POLLINGFREQ); // This is the crucial delay that determines frequnecy of polling
+
+            if (meetpie_obj.button_pressed(meetpie_obj.start_stop_pin) == 1)  // User requested STOP
                 status = STOP;
 
             audio_obj.get_data();                      // Get Audio source data
