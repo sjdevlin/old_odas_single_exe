@@ -8,12 +8,9 @@ MEETPIE::MEETPIE(uint16_t leds) : matrix_image1d(leds)
     gpio_input_mode = 0; // input
     start_stop_pin = 0;  // GPIO 0
     mode_pin = 1;        //GPIO 1
-    mode = SHAREOFVOICE; // default mode for now (will change to dark for produciton)
+    mode = DEBUG; // default mode for now (will change to dark for produciton)
     num_leds = leds;     // This allows both Matrix Creator (32 Leds) and Voice (18 Leds) can be used
 
-    int red[MAXPART] = {0, 200, 0, 0, 100, 0, 100, 100}; // Array to store unique colour for each participant
-    int green[MAXPART] = {0, 0, 200, 0, 100, 100, 0, 50};
-    int blue[MAXPART] = {0, 0, 0, 150, 0, 100, 100, 50};
 
     if (!matrix_bus.Init())
         printf("Bus did not load \n"); // Question for JJ.  Advice for error handling...
@@ -25,21 +22,24 @@ MEETPIE::MEETPIE(uint16_t leds) : matrix_image1d(leds)
     matrix_everloop.Setup(&matrix_bus);
 
     // these variables are for share of voice led display
-    virtual_led_ring = malloc(uint16_t, num_leds);
-    memset(virtual_led_ring, 0, num_leds);
-    uint16_t closest_led[MAXPART] = {0, 0, 0, 0, 0, 0, 0, 0};
-    uint16_t segment_led[MAXPART] = {0, 0, 0, 0, 0, 0, 0, 0};
+    virtual_led_ring = (uint16_t*) malloc(num_leds * sizeof(uint16_t));
+    memset(virtual_led_ring, 0, num_leds* sizeof(uint16_t));
+    closest_led = (uint16_t*) malloc(MAXPART * sizeof(uint16_t));
+    memset(closest_led, 0, MAXPART* sizeof(uint16_t));
+    segment_led = (uint16_t*) malloc(MAXPART * sizeof(uint16_t));
+    memset(segment_led, 0, MAXPART* sizeof(uint16_t));
 
     // now switch off all the LEDs
     for (matrix_hal::LedValue &led : matrix_image1d.leds)
     {
-        led.red = 0;
-        led.green = 0;
+        led.red = 10;
+        led.green = 10;
         led.blue = 0;
         led.white = 0;
     }
 
     matrix_everloop.Write(&matrix_image1d);
+
 }
 
 void MEETPIE::update(MEETING meeting_obj)
@@ -54,7 +54,7 @@ void MEETPIE::update(MEETING meeting_obj)
         for (int i = 1; i <= meeting_obj.num_participants; i++)
         {
 
-            closest_led[i] = meeting_obj.participant[i].angle * num_leds / 360; // this is not optimal will look to stoare in a vector eventually
+            closest_led[i] = num_leds - (meeting_obj.participant[i].angle * num_leds / 360); // this is not optimal will look to stoare in a vector eventually
 
             if (meeting_obj.participant[i].is_talking == 1)
             {
@@ -78,8 +78,9 @@ void MEETPIE::update(MEETING meeting_obj)
 
         // calculate share of LEDS
 
-        if (meeting_obj.total_talk_time % 20 == 0) // this section fairly long so only do every 20 cycles
+        if (meeting_obj.num_participants >0 && meeting_obj.total_talk_time % 10 == 0) // this section fairly long so only do every 20 cycles
         {
+
             uint16_t num_leds_per_participant;
             uint16_t next_person;
             uint16_t last_led = 0;
@@ -91,23 +92,44 @@ void MEETPIE::update(MEETING meeting_obj)
 
             {
                 closest_led[i] = meeting_obj.participant[i].angle * num_leds / 360;
+          	    if (debug_mode == 0x01) printf("closest led for talker i %d is %d\n",i,closest_led[i]);
 
-                next_person = meeting_obj.participant_clockface[i]; // this means we are starting at the talker closest to 0
+                next_person = meeting_obj.participant_clock_order[i]; // this means we are starting at the talker closest to 0
+          	    if (debug_mode == 0x01) printf("person in position %d is %d\n",i,next_person);
 
-                num_leds_per_participant = num_leds * meeting_obj.total_talk_time / meeting_obj.participant[next_person].total_talk_time;
+
+		printf("total talk %d, perp total talk %d, num_leds %d\n", meeting_obj.total_talk_time, 
+meeting_obj.participant[next_person].total_talk_time, num_leds);
+
+                num_leds_per_participant = num_leds * meeting_obj.participant[next_person].total_talk_time/meeting_obj.total_talk_time ;
+          	    if (debug_mode == 0x01) printf("num led for talker i %d is %d\n",i,num_leds_per_participant);
 
                 for (int j = 0; j < num_leds_per_participant; j++)
                 {
                     // this finds the centre of the segment - needed for centering the segment on the active talker
-                    if (j == num_leds_per_participant / 2)
-                        segment_led[i] = last_led + j;
+                    if (j == (num_leds_per_participant / 2))
+                        segment_led[next_person] = last_led + j;
                     virtual_led_ring[last_led] = next_person;
                     ++last_led;
                 }
             }
 
+	    if (debug_mode == 0x01)
+             {
+          	 printf("seg led for talker 1 is %d\n",segment_led[1]);
+          	 printf("seg led for talker 2 is %d\n",segment_led[2]);
+          	 printf("seg led for talker 3 is %d\n",segment_led[3]);
+		 printf("virtual led ring = ");
+		 for (int i=0;i<num_leds;i++) printf ("%d ",virtual_led_ring[i]);
+		 printf("\n");
+	     }
+
+
             // now we will work out how much to rotate the array to be centered on the current speaker
+	
+	    if (debug_mode ==0x01) printf ("last talker %d",meeting_obj.last_talker); 
             int offset = closest_led[meeting_obj.last_talker] - segment_led[meeting_obj.last_talker];
+	    if (debug_mode ==0x01) printf ("offset %d",offset); 
 
             for (int i = 0; i < num_leds; i++)
             {
@@ -123,13 +145,14 @@ void MEETPIE::update(MEETING meeting_obj)
                     {
                         matrix_image1d.leds[i].red = red[virtual_led_ring[i+offset-num_leds]];
                         matrix_image1d.leds[i].green = green[virtual_led_ring[i+offset-num_leds]];
-                        matrix_image1d.leds[i].blue = blue[virtual_led_ring[i+offset-num_leds]];                    }
+                        matrix_image1d.leds[i].blue = blue[virtual_led_ring[i+offset-num_leds]];
+                    }
                 }
                 else
                 {
                         matrix_image1d.leds[i].red = red[virtual_led_ring[i+offset+num_leds]];
                         matrix_image1d.leds[i].green = green[virtual_led_ring[i+offset+num_leds]];
-                        matrix_image1d.leds[i].blue = blue[virtual_led_ring[i+offset+num_leds]];                    }
+                        matrix_image1d.leds[i].blue = blue[virtual_led_ring[i+offset+num_leds]];                    
                 }
             }
         }
@@ -182,6 +205,6 @@ bool MEETPIE::button_pressed(uint16_t pin)
 {
     bool temp;
     temp = matrix_gpio.GetGPIOValue(pin);
-    printf("button %d: %d \n", pin, temp);
+//    printf("button %d: %d \n", pin, temp);
     return temp;
 }

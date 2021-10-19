@@ -14,7 +14,7 @@ AUDIO::AUDIO()
 
 void AUDIO::get_data()
 {
-	printf("debug %d signals %d\n", debug_mode,aobjs->asnk_categories_object->snk_categories->nChannels); 	
+//	printf("debug %d signals %d\n", debug_mode,aobjs->asnk_categories_object->snk_categories->nChannels); 	
 
     for (int i = 0; i < aobjs->asnk_categories_object->snk_categories->nChannels;i++)
     {
@@ -23,8 +23,8 @@ void AUDIO::get_data()
         y_array[i] = aobjs->asnk_categories_object->snk_categories->safe_buffer->Y_array[i];
         freq_array[i] = aobjs->asnk_categories_object->snk_categories->safe_buffer->freq_array[i];
 
-    if (debug_mode == 0x01)
-        printf("Odas data [%d]: E[%1.1f],X[%1.2f],Y[%1.2f],f[%3.0f]\n", i, energy_array[i], x_array[i], y_array[i], freq_array[i]);
+//    if (debug_mode == 0x01)
+//        printf("Odas data [%d]: E[%1.1f],X[%1.2f],Y[%1.2f],f[%3.0f]\n", i, energy_array[i], x_array[i], y_array[i], freq_array[i]);
     }
 }
 

@@ -17,7 +17,7 @@ void MEETING::initialize()
         participant[i].share_of_voice = 0;
         participant[i].frequency = 0.0;
 
-        participant_clockface[i]=0;
+        participant_clock_order[i]=0;
     }
 
     for (i = 0; i < 360; i++)
@@ -31,14 +31,13 @@ void MEETING::initialize()
     num_participants = 0;
     last_talker = 0;
     num_talking = 0;
-    start_time = time();
+    start_time = time(NULL);
 }
 
-void MEETING::process_latest_data(AUDIO odas_obj, uint16_t polling_freq)
+void MEETING::process_latest_data(AUDIO odas_obj)
 {
 
     int target_angle, iChannel, iAngle;
-    static int prospective_source[4] = {0, 0, 0, 0}; // not pretty but will work for now - assumes NUMCHANNELS <= 4
 
     num_talking = 0;
     ++total_meeting_time;  // may not be needed eventually (as we have duration) but keeping for now
@@ -47,7 +46,7 @@ void MEETING::process_latest_data(AUDIO odas_obj, uint16_t polling_freq)
     {
         //  dont use energy to check if track is active otherwise you miss the ending of the speech and
         //  participant talking is never set to false
-        if (odas_obj.x_array[iChannel] != 0.0 && odas_obj.y_array[iChannel] != 0.0)
+        if (odas_obj.x_array[iChannel] != 0.0 || odas_obj.y_array[iChannel] != 0.0)
         {
             total_silence = 0; // consider moving this
             target_angle = 180 - (atan2(odas_obj.x_array[iChannel], odas_obj.y_array[iChannel]) * 57.3);
@@ -66,8 +65,11 @@ void MEETING::process_latest_data(AUDIO odas_obj, uint16_t polling_freq)
 
                     ++num_participants;
                     ++num_talking; // another person is talking in this session
+                    ++total_talk_time;
+                    ++participant[num_participants].total_talk_time;
                     participant_at_angle[target_angle] = num_participants;
                     participant[num_participants].angle = target_angle;
+
 
                     participant[num_participants].frequency = odas_obj.freq_array[iChannel];
                     // write a buffer around them
@@ -97,23 +99,23 @@ void MEETING::process_latest_data(AUDIO odas_obj, uint16_t polling_freq)
                         }
                     }
 
-                    participant[num_participants].is_talking = iChannel;
-                    participant[num_participants].led = participant[num_participants].angle * num_leds / 360;
+                    participant[num_participants].is_talking = 1;  
 
                     // now update the clockface
                     int ang_order = 1;
+		    int last_person_in_clock_order = 0;
+
                     for (int i = 0 ; i <360; i=i+ANGLESPREAD)
                     {
-                        if (meeting_obj.participant_at_angle[i]>0  && meeting_obj.participant_clockface[ang_order] != meeting_obj.participant_at_angle[i])
+                        if (participant_at_angle[i] != 0 && participant_at_angle[i] != last_person_in_clock_order)
                         {
-                            meeting_obj.participant_clockface[ang_order] = meeting_obj.participant_at_angle[i];
+			    printf ("angle %d participant %d order %d\n",i,participant_at_angle[i], ang_order);
+                            participant_clock_order[ang_order] = participant_at_angle[i];
+			    last_person_in_clock_order = participant_at_angle[i];
                             ++ang_order;
 
                         }
                     }
-
-            }
-
 
                 }
             }
@@ -122,8 +124,7 @@ void MEETING::process_latest_data(AUDIO odas_obj, uint16_t polling_freq)
                 // could put logic in here to count turns
                 participant[participant_at_angle[target_angle]].is_talking = 1;
                 ++participant[participant_at_angle[target_angle]].total_talk_time;
-                if (num_talking ==1) ++total_talk_time; // check num_talking to avoid double counting talk time 
-                ++num_talking; // another person is talking in this session
+                if (++num_talking ==1) ++total_talk_time; // check num_talking to avoid double counting talk time 
 
             }
         }

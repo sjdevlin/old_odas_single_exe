@@ -134,7 +134,7 @@ void BLE::update(MEETING meeting_obj)
 
 			mutex_buffer.unlock();
 
-		    if (debug_mode == 0x01) printf ("Bluetooth data: %s\n",server_data_text_String.c_str());
+//		    if (debug_mode == 0x01) printf ("Bluetooth data: %s\n",server_data_text_String.c_str());
 
     		// now the output string is ready and_swe should call notify
 			ggkNofifyUpdatedCharacteristic("/com/gobbledegook/text/string");

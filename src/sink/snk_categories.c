@@ -56,8 +56,6 @@
         free((void *) obj->safe_buffer->Y_array);
         free((void *) obj->safe_buffer->freq_array);
 
-        free((void *) obj);
-
     }
 
     void snk_categories_connect(snk_categories_obj * obj, msg_categories_obj * in) {

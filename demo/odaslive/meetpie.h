@@ -20,6 +20,12 @@
 //#include "../cpp/driver/imu_data.h"
 //#include "../cpp/driver/imu_sensor.h"
 
+#define MAXPART 8
+#define MAXMODES 3
+#define DARK 0
+#define SHAREOFVOICE 1
+#define DEBUG 2
+
 
 class MEETPIE
 {
@@ -42,10 +48,13 @@ private:
     matrix_hal::Everloop matrix_everloop;
 
     uint16_t* virtual_led_ring;
-    uint16_t closest_led[MAXPART];
-    uint16_t segment_led[MAXPART];
+    uint16_t* closest_led;
+    uint16_t* segment_led;
 
-    int red[MAXPART], blue[MAXPART], green[MAXPART];
+    const int red[MAXPART] = {0, 200, 0, 0, 100, 0, 100, 100}; // Array to store unique colour for each participant
+    const int green[MAXPART] = {0, 0, 200, 0, 100, 100, 0, 50};
+    const int blue[MAXPART] = {0, 0, 0, 150, 0, 100, 100, 50};
+
     uint16_t gpio_input_mode;
 
 };

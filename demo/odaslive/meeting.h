@@ -11,12 +11,13 @@
 #include <time.h>
 #include "audio.h"
 
+#define MAXPART 8
 #define MAXSILENCE 500
-#define NUMCHANNELS 3
+#define NUMCHANNELS 2
 #define ANGLESPREAD 10
 #define MINTURNSILENCE 30
 #define MINENERGY 0.2
-#define MINTALKTIME 10
+#define MINTALKTIME 3
 
 extern char debug_mode;
 
@@ -46,7 +47,7 @@ struct participant_data{
     int last_talker;
     int num_talking;
     time_t duration;
-    int participant_clock_order[MAXPART]
+    int participant_clock_order[MAXPART];
     struct participant_data participant[MAXPART];
 
 private:

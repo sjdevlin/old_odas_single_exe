@@ -10,7 +10,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "/home/pi/odas/bin/meetpie",
-            "args": ["-d -c/home/pi/odas/config/odaslive/matrix_voice.cfg"],
+            "args": ["-c/home/pi/odas/config/odaslive/matrix_voice.cfg"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
