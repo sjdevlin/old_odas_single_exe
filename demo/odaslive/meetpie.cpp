@@ -150,16 +150,13 @@ MEETPIE::MEETPIE(uint16_t leds) : matrix_image1d(leds)
                         // this finds the centre of the segment - needed for centering the segment on the active talker
                         if (j == (num_leds_per_participant / 2))
                             segment_led[next_person] = last_led + j;
-                        virtual_led_ring[last_led] = next_person;
+                            virtual_led_ring[last_led] = next_person;
                         ++last_led;
                     }
                 }
 
                 if (debug_mode == 0x01)
                 {
-                    printf("seg led for talker 1 is %d\n", segment_led[1]);
-                    printf("seg led for talker 2 is %d\n", segment_led[2]);
-                    printf("seg led for talker 3 is %d\n", segment_led[3]);
                     printf("virtual led ring = ");
                     for (int i = 0; i < num_leds; i++)
                         printf("%d ", virtual_led_ring[i]);
