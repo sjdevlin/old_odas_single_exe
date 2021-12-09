@@ -19,6 +19,10 @@ void MEETING::initialize()
 
         participant_clock_order[i]=0;
     }
+    for (i = 0; i < NUMCHANNELS; i++)
+    {
+        prospective_source[i] = 0;
+    }
 
     for (i = 0; i < 360; i++)
     {
@@ -37,14 +41,24 @@ void MEETING::initialize()
 void MEETING::process_latest_data(AUDIO odas_obj)
 {
 
-    int target_angle, iChannel, iAngle;
+    // NOTE THIS ROUTINE SHOULD BE OPTIMISED AS CALLED OFTEN
+
+    int i, target_angle, iChannel, iAngle;
 
     num_talking = 0;
     ++total_meeting_time;  // may not be needed eventually (as we have duration) but keeping for now
 
+    for (i =1; i<=num_participants;i++)
+    {
+     	participant[i].is_talking = 0;
+    }
+
+
+
     for (iChannel = 0; iChannel < NUMCHANNELS; iChannel++)
     {
-        //  dont use energy to check if track is active otherwise you miss the ending of the speech and
+
+	//  dont use energy to check if track is active otherwise you miss the ending of the speech and
         //  participant talking is never set to false
         if (odas_obj.x_array[iChannel] != 0.0 || odas_obj.y_array[iChannel] != 0.0)
         {
@@ -69,6 +83,7 @@ void MEETING::process_latest_data(AUDIO odas_obj)
                     ++participant[num_participants].total_talk_time;
                     participant_at_angle[target_angle] = num_participants;
                     participant[num_participants].angle = target_angle;
+                    participant[num_participants].is_talking = 1;
 
 
                     participant[num_participants].frequency = odas_obj.freq_array[iChannel];
@@ -99,13 +114,11 @@ void MEETING::process_latest_data(AUDIO odas_obj)
                         }
                     }
 
-                    participant[num_participants].is_talking = 1;  
-
                     // now update the clockface
                     int ang_order = 1;
 		    int last_person_in_clock_order = 0;
 
-                    for (int i = 0 ; i <360; i=i+ANGLESPREAD)
+                    for (i = 0 ; i <360; i=i+ANGLESPREAD)
                     {
                         if (participant_at_angle[i] != 0 && participant_at_angle[i] != last_person_in_clock_order)
                         {

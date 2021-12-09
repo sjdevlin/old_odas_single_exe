@@ -28,11 +28,13 @@ void AUDIO::get_data()
     }
 }
 
-void AUDIO::stop(char * file_config)
+void AUDIO::stop()
 {
     if (debug_mode == 0x01)
         printf("| + Stopping Threads.................  \n ");
+
     threads_multiple_stop(aobjs);
+//    threads_multiple_join(aobjs);
 
     if (debug_mode == 0x01)
         printf("[Done] |\n");
@@ -41,9 +43,10 @@ void AUDIO::stop(char * file_config)
         printf("| + Free memory......................  \n");
 
     aobjects_destroy(aobjs);
+        printf("| + Objects Destroyed................  \n");
     configs_destroy(cfgs);
-    free((void *)file_config);
-
+        printf("| + Configs Destroyed................  \n");
+    
     if (debug_mode == 0x01)
         printf("[Done] |\n");
 }

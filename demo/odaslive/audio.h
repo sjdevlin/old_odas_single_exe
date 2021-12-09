@@ -24,7 +24,7 @@ class AUDIO
 public:
     AUDIO();
     void start(char *);
-    void stop(char *);
+    void stop();
     void get_data();
 
     float energy_array[4];

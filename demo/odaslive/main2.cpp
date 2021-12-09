@@ -17,14 +17,7 @@
 #define RUNNING 0x03
 
 #define NUMLEDS 18  // eventually this will go into a parameter file
-#define POLLINGFREQ 1  // also this into a parameter file
-
-#define MAXMODES 3
-#define DARK 0
-#define SHAREOFVOICE 1
-#define DEBUG 2
-
-#define MAXPART 8
+#define POLLINGFREQ 500000  // also this into a parameter file
 
 
 char debug_mode = 0x00; // global variable for debugging flag
@@ -107,7 +100,7 @@ int main(int argc, char *argv[])
                 mode_pressed = 0x00;
                 if (debug_mode == 0x01) printf ("Mode changed to %d\n",meetpie_obj.mode);
             }
-            sleep(POLLINGFREQ);
+            usleep(POLLINGFREQ);
             break;
 
         case START:
@@ -119,7 +112,7 @@ int main(int argc, char *argv[])
 
         case RUNNING:
 
-            sleep(POLLINGFREQ); // This is the crucial delay that determines frequnecy of polling
+            usleep(POLLINGFREQ); // This is the crucial delay that determines frequnecy of polling
 
             if (meetpie_obj.button_pressed(meetpie_obj.start_stop_pin) == 1)  // User requested STOP
                 status = STOP;
@@ -132,14 +125,18 @@ int main(int argc, char *argv[])
             // if room silent for more than a certain time assume meeting over
 
             if (meeting_obj.total_silence > MAXSILENCE)
-                status=STOP;
+	    {
+		if (debug_mode == 0x01) printf ("Stopping due to silence of %d units\n", meeting_obj.total_silence);
 
+                status=STOP;
+	    }
             break;
 
         case STOP:
 
-            meetpie_obj.write_to_file(meeting_obj);
-            audio_obj.stop(file_config);
+//            meetpie_obj.write_to_file(meeting_obj);
+            audio_obj.stop();
+
             status = STOPPED;
 
             break;
@@ -149,14 +146,13 @@ int main(int argc, char *argv[])
         }
     }
 
-    // shutting down
-    // first write summary to file
-    meetpie_obj.write_to_file(meeting_obj);
-
-    // stop threads and clean up audio objects
-    audio_obj.stop(file_config);
- 
+    if (status == RUNNING)  // this means it was a shutdown request from ctrl C
+    {
+//    	meetpie_obj.write_to_file(meeting_obj);    
+	audio_obj.stop();
+    }
+    
+    free((void *) file_config);
     ble_obj.stop();
- 
     exit(0);
 }

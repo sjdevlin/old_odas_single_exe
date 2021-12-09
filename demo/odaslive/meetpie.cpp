@@ -41,10 +41,10 @@ MEETPIE::MEETPIE(uint16_t leds) : matrix_image1d(leds)
     const float freq = 0.375;
 
     // 10 sec loop for rainbow effect 250*40000 microsec = 10 sec
-    for (int i = 0; i <= 10; i++)
+    for (int i = 0; i <= 40; i++)
     {
         // For each led in everloop_image.leds, set led value
-        for (matrix_hal::LedValue &led : everloop_image.leds)
+        for (matrix_hal::LedValue &led : matrix_image1d.leds)
         {
             // Sine waves 120 degrees out of phase for rainbow
             led.red =
@@ -65,10 +65,10 @@ MEETPIE::MEETPIE(uint16_t leds) : matrix_image1d(leds)
         }
 
         // Updates the LEDs
-        everloop.Write(&everloop_image);
+        matrix_everloop.Write(&matrix_image1d);
 
         // Sleep for 40000 microseconds
-        usleep(100000);
+        usleep(30000);
     }
 
     for (matrix_hal::LedValue &led : matrix_image1d.leds)
@@ -77,9 +77,10 @@ MEETPIE::MEETPIE(uint16_t leds) : matrix_image1d(leds)
         led.green = 0;
         led.blue = 0;
         led.white = 0;
-        usleep(100000);
+        usleep(20000);
         matrix_everloop.Write(&matrix_image1d);
     }
+}
 
     void MEETPIE::update(MEETING meeting_obj)
     {
@@ -93,7 +94,11 @@ MEETPIE::MEETPIE(uint16_t leds) : matrix_image1d(leds)
             for (int i = 1; i <= meeting_obj.num_participants; i++)
             {
 
-                closest_led[i] = num_leds - (meeting_obj.participant[i].angle * num_leds / 360); // this is not optimal will look to stoare in a vector eventually
+                closest_led[i] =  ((360 - meeting_obj.participant[i].angle) * num_leds / 360) + 13;
+
+		if (closest_led[i] >17 ) closest_led[i] -= 18;     // this is not optimal will look to stoare in a vector eventually
+
+		printf (" led: %d    angle: %d \n", closest_led[i], meeting_obj.participant[i].angle);
 
                 if (meeting_obj.participant[i].is_talking == 1)
                 {
@@ -209,6 +214,8 @@ MEETPIE::MEETPIE(uint16_t leds) : matrix_image1d(leds)
     {
         std::string text_line;
 
+        printf("writing to file\n");
+
         if (meeting_obj.num_participants > 0)
         {
             struct tm *timenow;
@@ -239,6 +246,12 @@ MEETPIE::MEETPIE(uint16_t leds) : matrix_image1d(leds)
 
             file.close();
         }
+	else
+	{
+        	printf("No participnts\n");
+
+	}
+
     }
 
     bool MEETPIE::button_pressed(uint16_t pin)

@@ -84,6 +84,7 @@ bool BLE::start()
 
 void BLE::stop()
 {
+	printf("got to ggk shut down and wait");
     ggkShutdownAndWait();
 
 }

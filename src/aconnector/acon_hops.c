@@ -59,10 +59,12 @@
         for (iOut = 0; iOut < nOuts; iOut++) {
             amsg_hops_destroy(obj->outs[iOut]);
         }
+	printf("free up obj->outs\n");
         free((void *) obj->outs);
 
         amsg_hops_destroy(obj->in);
 
+	printf("free up obj \n");
         free((void *) obj);
 
 

@@ -33,6 +33,10 @@
 
         obj->nChannels = msg_categories_config->nChannels;
         obj->fS = snk_categories_config->fS;
+
+        obj->format = format_clone(snk_categories_config->format);
+        obj->interface = interface_clone(snk_categories_config->interface);
+
         
         obj->safe_buffer = (categories_obj *) malloc(sizeof(categories_obj));
         obj->safe_buffer->energy_array = (float *) malloc(sizeof(float) * msg_categories_config->nChannels);
@@ -49,12 +53,15 @@
     void snk_categories_destroy(snk_categories_obj * obj) {
 
         format_destroy(obj->format);
+	printf("try destroy interface\n");
         interface_destroy(obj->interface);
+	printf("successfuly destroyed interface\n");
 
         free((void *) obj->safe_buffer->energy_array);
         free((void *) obj->safe_buffer->X_array);
         free((void *) obj->safe_buffer->Y_array);
         free((void *) obj->safe_buffer->freq_array);
+	printf("successfuly destroyed safe buffer\n");
 
     }
 

@@ -12,12 +12,12 @@
 #include "audio.h"
 
 #define MAXPART 8
-#define MAXSILENCE 500
-#define NUMCHANNELS 2
-#define ANGLESPREAD 10
+#define MAXSILENCE 100 // temp small for debug
+#define NUMCHANNELS 3
+#define ANGLESPREAD 15
 #define MINTURNSILENCE 30
 #define MINENERGY 0.2
-#define MINTALKTIME 3
+#define MINTALKTIME 5
 
 extern char debug_mode;
 
@@ -52,6 +52,7 @@ struct participant_data{
 
 private:
     time_t start_time;
+    int prospective_source[NUMCHANNELS];
 };
 
 #endif 
