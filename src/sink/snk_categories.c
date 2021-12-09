@@ -38,11 +38,7 @@
         obj->interface = interface_clone(snk_categories_config->interface);
 
         
-        obj->safe_buffer = (categories_obj *) malloc(sizeof(categories_obj));
-        obj->safe_buffer->energy_array = (float *) malloc(sizeof(float) * msg_categories_config->nChannels);
-        obj->safe_buffer->X_array = (float *) malloc(sizeof(float) * msg_categories_config->nChannels);
-        obj->safe_buffer->Y_array = (float *) malloc(sizeof(float) * msg_categories_config->nChannels);
-        obj->safe_buffer->freq_array = (float *) malloc(sizeof(float) * msg_categories_config->nChannels);
+        obj->safe_buffer = categories_construct_zero(msg_categories_config->nChannels);
 
         obj->in = (msg_categories_obj *) NULL;
 
@@ -53,15 +49,14 @@
     void snk_categories_destroy(snk_categories_obj * obj) {
 
         format_destroy(obj->format);
-	printf("try destroy interface\n");
-        interface_destroy(obj->interface);
-	printf("successfuly destroyed interface\n");
 
-        free((void *) obj->safe_buffer->energy_array);
-        free((void *) obj->safe_buffer->X_array);
-        free((void *) obj->safe_buffer->Y_array);
-        free((void *) obj->safe_buffer->freq_array);
-	printf("successfuly destroyed safe buffer\n");
+        interface_destroy(obj->interface);
+	    printf("successfuly destroyed interface\n");
+
+        categories_destroy(obj->safe_buffer);
+	    printf("successfuly destroyed safe buffer\n");
+
+        free ((void *) obj);
 
     }
 
@@ -94,7 +89,7 @@
 
         if (obj->in->timeStamp != 0) {
 
-            if (obj->in->timeStamp%100 == 0) {
+            if (obj->in->timeStamp%50 == 0) {
 
             memcpy(obj->safe_buffer->energy_array,obj->in->categories->energy_array, sizeof(float) * obj->nChannels);
             memcpy(obj->safe_buffer->X_array,obj->in->categories->X_array, sizeof(float) * obj->nChannels);

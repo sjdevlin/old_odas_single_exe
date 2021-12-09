@@ -64,18 +64,18 @@ int main(int argc, char *argv[])
         }
     }
 
-    // remember to add error codes that bubble up
+    // JJ remember to add error codes that bubble up
 
     // Setup our signal handlers
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
 
     char status = STOPPED; // make sure main loop starts in right mode
-    char start_stop_pressed = 0x00;
-    char mode_pressed = 0x00;
+    char start_stop_pressed = 0x00;  // holds status of start/stop button
+    char mode_pressed = 0x00;  // holds status of mode button
 
-    // start up bluetooth server
-    if (!ble_obj.start())
+    // start up the bluetooth server
+    if (!ble_obj.start())  // fatal error if bluetooth is unable to start
     {
         printf("error starting bluetooth");
         exit(0);
@@ -112,11 +112,6 @@ int main(int argc, char *argv[])
 
         case RUNNING:
 
-            usleep(POLLINGFREQ); // This is the crucial delay that determines frequnecy of polling
-
-            if (meetpie_obj.button_pressed(meetpie_obj.start_stop_pin) == 1)  // User requested STOP
-                status = STOP;
-
             audio_obj.get_data();                      // Get Audio source data
             meeting_obj.process_latest_data(audio_obj); // update meeting object
             meetpie_obj.update(meeting_obj);
@@ -125,18 +120,23 @@ int main(int argc, char *argv[])
             // if room silent for more than a certain time assume meeting over
 
             if (meeting_obj.total_silence > MAXSILENCE)
-	    {
-		if (debug_mode == 0x01) printf ("Stopping due to silence of %d units\n", meeting_obj.total_silence);
-
+    	    {
+	        	if (debug_mode == 0x01) printf ("Stopping due to silence of %d units\n", meeting_obj.total_silence);
                 status=STOP;
-	    }
+    	    }
+
+            if (meetpie_obj.button_pressed(meetpie_obj.start_stop_pin) == 1)  // User requested STOP
+                status = STOP;
+
+            usleep(POLLINGFREQ); // This is the crucial delay that determines frequnecy of polling
+
+
             break;
 
         case STOP:
 
-//            meetpie_obj.write_to_file(meeting_obj);
+            meetpie_obj.write_to_file(meeting_obj);
             audio_obj.stop();
-
             status = STOPPED;
 
             break;
@@ -148,11 +148,13 @@ int main(int argc, char *argv[])
 
     if (status == RUNNING)  // this means it was a shutdown request from ctrl C
     {
-//    	meetpie_obj.write_to_file(meeting_obj);    
-	audio_obj.stop();
+        meetpie_obj.write_to_file(meeting_obj);    
+	    audio_obj.stop();
     }
     
     free((void *) file_config);
-    ble_obj.stop();
+
+    ble_obj.stop();  // Stop the ggk server
+
     exit(0);
 }

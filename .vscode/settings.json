@@ -1,4 +1,7 @@
 {
     "C_Cpp.default.configurationProvider": "ms-vsvode.cmake-tools",
-    "files.associations": {"type_traits":"cpp"}
+    "files.associations": {
+        "type_traits": "cpp"
+    },
+    "cmake.configureOnOpen": false
 }
