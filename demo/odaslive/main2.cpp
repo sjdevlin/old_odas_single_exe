@@ -75,11 +75,14 @@ int main(int argc, char *argv[])
     char mode_pressed = 0x00;  // holds status of mode button
 
     // start up the bluetooth server
-    if (!ble_obj.start())  // fatal error if bluetooth is unable to start
+
+
+/*    if (!ble_obj.start())  // fatal error if bluetooth is unable to start
     {
         printf("error starting bluetooth");
         exit(0);
     }
+*/
 
     while (shutdown_request != 0x01)
     {
@@ -115,7 +118,8 @@ int main(int argc, char *argv[])
             audio_obj.get_data();                      // Get Audio source data
             meeting_obj.process_latest_data(audio_obj); // update meeting object
             meetpie_obj.update(meeting_obj);
-            ble_obj.update(meeting_obj);
+
+//            ble_obj.update(meeting_obj);
 
             // if room silent for more than a certain time assume meeting over
 
@@ -154,7 +158,7 @@ int main(int argc, char *argv[])
     
     free((void *) file_config);
 
-    ble_obj.stop();  // Stop the ggk server
+//    ble_obj.stop();  // Stop the ggk server
 
     exit(0);
 }

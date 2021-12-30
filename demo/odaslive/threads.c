@@ -514,7 +514,8 @@
             // | Source                                               |
             // +------------------------------------------------------+  
 
-                thread_join(aobjs->asrc_hops_mics_object->thread);
+                thread_stop(aobjs->asrc_hops_mics_object->thread);
+//                thread_join(aobjs->asrc_hops_mics_object->thread);
 
             // +------------------------------------------------------+
             // | Connector                                            |

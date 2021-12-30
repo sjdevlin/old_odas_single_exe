@@ -96,11 +96,21 @@
             memcpy(obj->safe_buffer->Y_array,obj->in->categories->Y_array, sizeof(float) * obj->nChannels);
             memcpy(obj->safe_buffer->freq_array,obj->in->categories->freq_array, sizeof(float) * obj->nChannels);
 
-        }
+	   
+           }
+       rtnValue = 0;
+       
+       }
 
-    }
+else
+
+      {
+	rtnValue = -1;
+      }
+
 
 }
+
     snk_categories_cfg * snk_categories_cfg_construct(void) {
 
         snk_categories_cfg * cfg;
