@@ -14,10 +14,10 @@
 #define MAXPART 8
 #define MAXSILENCE 100 // temp small for debug
 #define NUMCHANNELS 3
-#define ANGLESPREAD 15
+#define ANGLESPREAD 20
 #define MINTURNSILENCE 30
 #define MINENERGY 0.2
-#define MINTALKTIME 5
+#define MINTALKTIME 10
 
 extern char debug_mode;
 

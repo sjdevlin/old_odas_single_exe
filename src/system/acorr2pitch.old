@@ -114,9 +114,8 @@
                 RNow = acorrs->array[iSignal][peakNow];
                 RNext = acorrs->array[iSignal][peakNext];
 
-//                pitches->array[iSignal] = ((float) peakNow) + ((RPrev - RNext) / (2*RPrev - 4*RNow + 2*RNext));
-//                printf ("p: %d Pit: %3.1f", peakNow, pitches->array[iSignal]);
-                pitches->array[iSignal] = ((float) peakNow) ;
+                pitches->array[iSignal] = ((float) peakNow) + ((RPrev - RNext) / (2*RPrev - 4*RNow + 2*RNext));
+                printf ("p: %d Pit: %3.1f", peakNow, pitches->array[iSignal]);
 
             }
             else {

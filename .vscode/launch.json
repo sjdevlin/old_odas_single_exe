@@ -10,12 +10,12 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "/home/pi/odas/bin/meetpie",
-            "args": ["-d-c/home/pi/odas/config/odaslive/matrix_voice.cfg"],
+            "args": ["-d-c/home/pi/odas/config/odaslive/matrix_creator.cfg"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "miDebuggerPath": "/home/pi/gdb.sh",
+            "miDebuggerPath": "/usr/bin/gdb",
             "MIMode": "gdb",
             "setupCommands": [
                 {

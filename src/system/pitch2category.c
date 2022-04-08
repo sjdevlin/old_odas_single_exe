@@ -156,11 +156,14 @@
                         // Speech
                         obj->categories[iSep] = 0x01;
 
+			printf("yes  f: %f3.2  d: %f2.2  pd: %f2.2  \n",obj->tausNow[iSep], obj->deltaTausNow[iSep], obj->deltaTausPrev[iSep]);
+
                         //only if MeetPie thinks its speech do we assign values
 
                     }
                     else {
 
+			printf("no   f: %f3.2  d: %f2.2  pd: %f2.2  \n",obj->tausNow[iSep], obj->deltaTausNow[iSep], obj->deltaTausPrev[iSep]);
                         // Non speech
                         obj->categories[iSep] = 0x00;
 

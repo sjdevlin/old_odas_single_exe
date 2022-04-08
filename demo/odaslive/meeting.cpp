@@ -17,7 +17,7 @@ void MEETING::initialize()
         participant[i].share_of_voice = 0;
         participant[i].frequency = 0.0;
 
-        participant_clock_order[i]=0;
+        participant_clock_order[i] = 0;
     }
     for (i = 0; i < NUMCHANNELS; i++)
     {
@@ -46,24 +46,22 @@ void MEETING::process_latest_data(AUDIO odas_obj)
     int i, target_angle, iChannel, iAngle;
 
     num_talking = 0;
-    ++total_meeting_time;  // may not be needed eventually (as we have duration) but keeping for now
+    ++total_meeting_time; // may not be needed eventually (as we have duration) but keeping for now
 
-    for (i =1; i<=num_participants;i++)
+    for (i = 1; i <= num_participants; i++)
     {
-     	participant[i].is_talking = 0;
+        participant[i].is_talking = 0;
     }
-
-
 
     for (iChannel = 0; iChannel < NUMCHANNELS; iChannel++)
     {
 
-	//  dont use energy to check if track is active otherwise you miss the ending of the speech and
+        //  dont use energy to check if track is active otherwise you miss the ending of the speech and
         //  participant talking is never set to false
         if (odas_obj.x_array[iChannel] != 0.0 || odas_obj.y_array[iChannel] != 0.0)
         {
             total_silence = 0; // consider moving this
-            target_angle = 180 - (atan2(odas_obj.x_array[iChannel], odas_obj.y_array[iChannel]) * 57.3);
+            target_angle = 180 - (atan2(odas_obj.y_array[iChannel], odas_obj.x_array[iChannel]) * 57.3);
 
             // participant_at_angle holds a int for every angle position.  Once an angle is set to true a person is registered there
             // so if tracked source is picked up we check to see if it is coming from a known participant
@@ -79,12 +77,10 @@ void MEETING::process_latest_data(AUDIO odas_obj)
 
                     ++num_participants;
                     ++num_talking; // another person is talking in this session
-                    ++total_talk_time;
                     ++participant[num_participants].total_talk_time;
                     participant_at_angle[target_angle] = num_participants;
                     participant[num_participants].angle = target_angle;
                     participant[num_participants].is_talking = 1;
-
 
                     participant[num_participants].frequency = odas_obj.freq_array[iChannel];
                     // write a buffer around them
@@ -116,20 +112,18 @@ void MEETING::process_latest_data(AUDIO odas_obj)
 
                     // now update the clockface
                     int ang_order = 1;
-		    int last_person_in_clock_order = 0;
+                    int last_person_in_clock_order = 0;
 
-                    for (i = 0 ; i <360; i=i+ANGLESPREAD)
+                    for (i = 0; i < 360; i = i + ANGLESPREAD)
                     {
                         if (participant_at_angle[i] != 0 && participant_at_angle[i] != last_person_in_clock_order)
                         {
-			    printf ("angle %d participant %d order %d\n",i,participant_at_angle[i], ang_order);
+                            printf("angle %d participant %d order %d\n", i, participant_at_angle[i], ang_order);
                             participant_clock_order[ang_order] = participant_at_angle[i];
-			    last_person_in_clock_order = participant_at_angle[i];
+                            last_person_in_clock_order = participant_at_angle[i];
                             ++ang_order;
-
                         }
                     }
-
                 }
             }
             else // its an existing talker we're hearing
@@ -137,14 +131,40 @@ void MEETING::process_latest_data(AUDIO odas_obj)
                 // could put logic in here to count turns
                 participant[participant_at_angle[target_angle]].is_talking = 1;
                 ++participant[participant_at_angle[target_angle]].total_talk_time;
-                if (++num_talking ==1) ++total_talk_time; // check num_talking to avoid double counting talk time 
-
+                ++num_talking;
             }
+
         }
         else
         {
             prospective_source[iChannel] = 0;
-            ++total_silence;
         }
     }
+
+    switch (num_talking)
+    {
+        case 0: 
+        ++total_silence;
+//        printf("silence\n");
+        break;
+
+        case 1:
+//        printf("1 talker\n");
+        ++total_talk_time;
+        for (i = 1; i <= num_participants; i++)
+        {
+            if (participant[i].is_talking == 1) last_talker = i;
+        }
+        break;
+        
+        case 2:
+//        printf("2 talker\n");
+        ++total_talk_time;
+        // put interrupting logic in here
+        break;
+
+
+    }
+
+
 }

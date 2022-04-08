@@ -43,9 +43,7 @@ void AUDIO::stop()
         printf("| + Free memory......................  \n");
 
     aobjects_destroy(aobjs);
-        printf("| + Objects Destroyed................  \n");
     configs_destroy(cfgs);
-        printf("| + Configs Destroyed................  \n");
     
     if (debug_mode == 0x01)
         printf("[Done] |\n");

@@ -63,7 +63,7 @@
         for (iSignal = 0; iSignal < obj->nSignals; iSignal++) {
 
             memset(obj->arrayIn, 0x00, sizeof(float) * obj->halfFrameSize * 2);
-
+            
             for (iBin = 0; iBin < obj->halfFrameSize; iBin++) {
 
                 Yreal = freqs->array[iSignal][iBin * 2 + 0];

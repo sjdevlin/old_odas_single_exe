@@ -1389,14 +1389,12 @@
                 // | Source                                           |
                 // +--------------------------------------------------+  
 
-			printf("destroy o1   \n");
                     asrc_hops_destroy(objs->asrc_hops_mics_object);
                     
                 // +--------------------------------------------------+
                 // | Connector                                        |
                 // +--------------------------------------------------+  
 
-			printf("destroy o2   \n");
                     acon_hops_destroy(objs->acon_hops_mics_raw_object);
 
             // +------------------------------------------------------+
@@ -1407,7 +1405,6 @@
                 // | Module                                           |
                 // +--------------------------------------------------+  
 
-			printf("destroy o3   \n");
                     amod_mapping_destroy(objs->amod_mapping_mics_object);
                     
                 // +--------------------------------------------------+
@@ -1516,14 +1513,12 @@
                 // | Sinks                                            |
                 // +--------------------------------------------------+  
 
-			printf("destroy t2   \n");
                     asnk_tracks_destroy(objs->asnk_tracks_sst_object);
 
                 // +--------------------------------------------------+
                 // | Connector                                        |
                 // +--------------------------------------------------+  
 
-			printf("destroy t3   \n");
                     acon_tracks_destroy(objs->acon_tracks_sst_object);  
 
             // +------------------------------------------------------+
@@ -1612,21 +1607,18 @@
                 // | Module                                           |
                 // +--------------------------------------------------+  
 
-			printf("Destroy 1\n");
                     amod_classify_destroy(objs->amod_classify_object);
 
                 // +--------------------------------------------------+
                 // | Connector                                        |
                 // +--------------------------------------------------+  
 
-			printf("Destroy 2\n");
                     acon_categories_destroy(objs->acon_categories_object);
                 
                 // +--------------------------------------------------+
                 // | Sink                                             |
                 // +--------------------------------------------------+                      
 
-			printf("Destroy 3\n");
                     asnk_categories_destroy(objs->asnk_categories_object);
 
         free((void *) objs);
