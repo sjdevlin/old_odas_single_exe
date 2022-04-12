@@ -207,6 +207,8 @@ void pitch2category_process(pitch2category_obj *obj, const pitches_obj *pitches,
         {
             obj->categories[iSep] = 0x02; // speech
             obj->meanPitch[iSep] = pitchMean;
+            printf("Speech%llu, %3.2f, %2.2f, %2.2f, %2.2f, %d \n", tracks->ids[iSep], pitchMean, relPitchVariance, relActivityVariance, harmonicAcorrMean, obj->numPitchValues[iSep]);
+
         }
         else
         {

@@ -101,6 +101,7 @@ int main(int argc, char *argv[])
         switch (status)
         {
         case STOPPED:
+            meetpie_obj.darken_all_led();
             meetpie_obj.light_led(STARTLED, RED);
 
             if (meetpie_obj.button_pressed(meetpie_obj.start_stop_pin))
@@ -215,10 +216,13 @@ int main(int argc, char *argv[])
 
 
             usleep(POLLINGFREQ); // This is the crucial delay that determines frequnecy of polling
+
             if (meetpie_obj.button_pressed(meetpie_obj.start_stop_pin) == 1) {
                             meetpie_obj.darken_all_led();
                             meetpie_obj.light_led(STARTLED, AMBER);
+                            time_button_pressed = 0;
                             status = STOP;
+
             }
 
             break;
@@ -227,7 +231,8 @@ int main(int argc, char *argv[])
 
             meetpie_obj.write_to_file(meeting_obj);
             audio_obj.stop();
-
+            usleep(TWO_SECONDS);
+            meetpie_obj.darken_all_led();
             status = STOPPED;
 
             break;

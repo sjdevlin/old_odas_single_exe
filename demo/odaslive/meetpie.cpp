@@ -6,8 +6,8 @@ MEETPIE::MEETPIE(uint16_t leds) : matrix_image1d(leds)
 {
 
     gpio_input_mode = 0; // input
-    start_stop_pin = 1 ; // GPIO 1
-    mode = DEBUG; // default mode for now (will change to dark for produciton)
+    start_stop_pin = 1;  // GPIO 1
+    mode = DEBUG;        // default mode for now (will change to dark for produciton)
     num_leds = leds;     // This allows both Matrix Creator (35 Leds) and Voice (18 Leds) can be used
 
     if (!matrix_bus.Init())
@@ -16,7 +16,7 @@ MEETPIE::MEETPIE(uint16_t leds) : matrix_image1d(leds)
     // Initialize the Matrix Hal Bus and set GPI pins to input
     matrix_gpio.Setup(&matrix_bus);
     matrix_gpio.SetMode(start_stop_pin, 0); // 0 sets pin for input
-//    matrix_gpio.SetMode(mode_pin, 0);       // 0 sets pin for input
+                                            //    matrix_gpio.SetMode(mode_pin, 0);       // 0 sets pin for input
     matrix_everloop.Setup(&matrix_bus);
 
     // these variables are for share of voice led display
@@ -150,8 +150,9 @@ void MEETPIE::update(MEETING meeting_obj)
 
             {
                 closest_led[i] = meeting_obj.participant[i].angle * num_leds / 360; // dont need to do every time !
-                seat_position = meeting_obj.participant_clock_order[i];               // this means we are starting at the talker closest to 0
-                num_leds_for_seat_position = num_leds * meeting_obj.participant[seat_position].total_talk_time / meeting_obj.total_talk_time;
+                seat_position = meeting_obj.participant_clock_order[i];             // this means we are starting at the talker closest to 0
+                num_leds_for_seat_position = ((num_leds * meeting_obj.participant[seat_position].total_talk_time) + (meeting_obj.total_talk_time - 1 ))/ meeting_obj.total_talk_time; // ensures rounding
+                printf("num leds for p%d is %d, ", i, num_leds_for_seat_position);
 
                 for (int j = 0; j < num_leds_for_seat_position; j++)
                 {
@@ -159,10 +160,14 @@ void MEETPIE::update(MEETING meeting_obj)
                     if (j == (num_leds_for_seat_position / 2))
                     {
                         segment_led[seat_position] = last_led;
-                        if (debug_mode == 0x01) printf ("Person in position %d has segment led : %d\n", i, segment_led[seat_position]);
+                        if (debug_mode == 0x01)
+                            printf("Person in position %d has segment led : %d\n", i, segment_led[seat_position]);
                     }
-                    virtual_led_ring[last_led] = seat_position;
-                    ++last_led;
+                    if (last_led < num_leds) 
+                    {
+                        virtual_led_ring[last_led] = seat_position;
+                        ++last_led;
+                    }
                 }
 
                 if (debug_mode == 0x01)
@@ -172,6 +177,14 @@ void MEETPIE::update(MEETING meeting_obj)
                     printf("total talk %d, perp talk %d\n ", meeting_obj.total_talk_time,
                            meeting_obj.participant[i].total_talk_time);
                 }
+            }
+
+            // adjust for rounding error - change this eventually to give extra point to the smallest talker
+            while (last_led < num_leds )
+            {
+                printf("round up was needed\n");
+                virtual_led_ring[last_led] = seat_position;
+                last_led++;
             }
 
             if (debug_mode == 0x01)
@@ -270,27 +283,26 @@ void MEETPIE::write_to_file(MEETING meeting_obj)
     }
 
     // switch off any lights
-/*
-    for (int i = 0; i <= 255; i++)
-    {
-        // For each led in everloop_image.leds, set led value
-        for (matrix_hal::LedValue &led : matrix_image1d.leds)
+    /*
+        for (int i = 0; i <= 255; i++)
         {
-            // Sine waves 120 degrees out of phase for rainbow
-            if (led.red > 0)
-                --led.red;
-            if (led.green > 0)
-                --led.green;
-            if (led.blue > 0)
-                --led.blue;
-            matrix_everloop.Write(&matrix_image1d);
+            // For each led in everloop_image.leds, set led value
+            for (matrix_hal::LedValue &led : matrix_image1d.leds)
+            {
+                // Sine waves 120 degrees out of phase for rainbow
+                if (led.red > 0)
+                    --led.red;
+                if (led.green > 0)
+                    --led.green;
+                if (led.blue > 0)
+                    --led.blue;
+                matrix_everloop.Write(&matrix_image1d);
 
-            // Sleep for 100 microseconds
-            usleep(100);
+                // Sleep for 100 microseconds
+                usleep(100);
+            }
         }
-    }
-*/
-
+    */
 }
 
 bool MEETPIE::button_pressed(uint16_t pin)

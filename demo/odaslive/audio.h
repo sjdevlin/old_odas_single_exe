@@ -27,7 +27,7 @@ public:
     void stop();
     void get_data();
 
-    unsigned long track_id[4];
+    unsigned long long track_id[4];
     float x_array[4];
     float y_array[4];
     float freq_array[4];

@@ -31,8 +31,8 @@
 
         obj->nSignals = nSignals;
 
-        obj->track_id = (unsigned long *) malloc(sizeof(unsigned long) * nSignals);
-        memset(obj->track_id, 0x00, sizeof(unsigned long) * nSignals);
+        obj->track_id = (unsigned long long *) malloc(sizeof(unsigned long long) * nSignals);
+        memset(obj->track_id, 0x00, sizeof(unsigned long long) * nSignals);
 
         obj->X_array = (float *) malloc(sizeof(float) * nSignals);
         memset(obj->X_array, 0x00, sizeof(float) * nSignals);
@@ -61,7 +61,7 @@
 
     void categories_copy(categories_obj * dest, const categories_obj * src) {
 
-        memcpy(dest->track_id, src->track_id, sizeof(unsigned long) * src->nSignals);
+        memcpy(dest->track_id, src->track_id, sizeof(unsigned long long) * src->nSignals);
         memcpy(dest->X_array, src->X_array, sizeof(float) * src->nSignals);
         memcpy(dest->Y_array, src->Y_array, sizeof(float) * src->nSignals);
         memcpy(dest->freq_array, src->freq_array, sizeof(float) * src->nSignals);
@@ -70,7 +70,7 @@
 
     void categories_zero(categories_obj * obj) {
 
-        memset(obj->track_id, 0x00, sizeof(unsigned long) * obj->nSignals);
+        memset(obj->track_id, 0x00, sizeof(unsigned long long) * obj->nSignals);
         memset(obj->X_array, 0x00, sizeof(float) * obj->nSignals);
         memset(obj->Y_array, 0x00, sizeof(float) * obj->nSignals);
         memset(obj->freq_array, 0x00, sizeof(float) * obj->nSignals);

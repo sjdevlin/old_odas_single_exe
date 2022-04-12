@@ -59,17 +59,20 @@ void MEETING::process_latest_data(AUDIO odas_obj)
 
         for (i = 1; i <= num_participants; i++)
         {
-            if (participant[i].last_track_id = odas_obj.track_id[iChannel])
+            if (participant[i].last_track_id == odas_obj.track_id[iChannel])
             {
+//                if (debug_mode == 0x01)
+//                    printf("Person %d Was already talking on channel %llu", i, odas_obj.track_id[iChannel]);
                 // this person was already talking
                 participant[i].is_talking = 1;
                 ++participant[i].total_talk_time;
-                ++num_talking;
-                channel_already_assigned = true;  
-            }
+                ++total_talk_time;
 
+                ++num_talking;
+                channel_already_assigned = true;
+            }
         }
-        
+
         // new source - but need to check if they are known
 
         if (odas_obj.track_id[iChannel] != 0 && !channel_already_assigned)
@@ -81,7 +84,7 @@ void MEETING::process_latest_data(AUDIO odas_obj)
             // so if tracked source is picked up we check to see if it is coming from a known participant
             // if it is not yet known then we also check that we havent reached max particpants before trying to add a new one
 
-            //max_num_participants -1 so that we dont go out of bounds - means 0 is never used so will need to optimise
+            // max_num_participants -1 so that we dont go out of bounds - means 0 is never used so will need to optimise
 
             if (participant_at_angle[target_angle] == 0x00 && num_participants < (MAXPART - 1))
             {
@@ -92,6 +95,8 @@ void MEETING::process_latest_data(AUDIO odas_obj)
                     ++num_participants;
                     ++num_talking; // another person is talking in this session
                     ++participant[num_participants].total_talk_time;
+                    ++total_talk_time;
+
                     participant_at_angle[target_angle] = num_participants;
                     participant[num_participants].angle = target_angle;
                     participant[num_participants].is_talking = 1;
@@ -145,9 +150,10 @@ void MEETING::process_latest_data(AUDIO odas_obj)
                 participant[participant_at_angle[target_angle]].last_track_id = odas_obj.track_id[iChannel]; // assign track id so we dont process again - avoids tracking sources !
                 participant[participant_at_angle[target_angle]].is_talking = 1;
                 ++participant[participant_at_angle[target_angle]].total_talk_time;
+                ++total_talk_time;
+
                 ++num_talking;
             }
-
         }
         else
         {
@@ -157,17 +163,16 @@ void MEETING::process_latest_data(AUDIO odas_obj)
 
     switch (num_talking)
     {
-        case 0: 
+    case 0:
         ++total_silence;
-//        printf("silence\n");
+        //        printf("silence\n");
         break;
 
-        case 1:
-//        printf("1 talker\n");
-        ++total_talk_time;
+    case 1:
+        //        printf("1 talker\n");
         for (i = 1; i <= num_participants; i++)
         {
-            if (participant[i].is_talking == 1 && last_talker != i) 
+            if (participant[i].is_talking == 1 && last_talker != i)
             {
                 ++participant[i].num_turns;
                 last_talker = i;
@@ -176,15 +181,10 @@ void MEETING::process_latest_data(AUDIO odas_obj)
             // put turns logic here ?
         }
         break;
-        
-        case 2:
-//        printf("2 talker\n");
-        ++total_talk_time;
+
+    case 2:
+        //        printf("2 talker\n");
         // put interrupting logic in here
         break;
-
-
     }
-
-
 }
