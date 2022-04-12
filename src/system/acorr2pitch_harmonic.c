@@ -55,42 +55,36 @@ void acorr2pitch_process(acorr2pitch_obj *obj, const acorrs_obj *acorrs, pitches
     float peakValue;
     float nextValue;
 
-    float maxValue;
-    unsigned int maxIndex;
-    char isPeak;
-    char peakFound;
+    float maxValue[2];
 
-    unsigned int peakPrev;
+    unsigned int MaxIndex[2];
+
+    char isPeak;
+    int nPeaksFound;
     unsigned int peakNow;
-    unsigned int peakNext;
-    float RPrev;
-    float RNow;
-    float RNext;
 
     for (iSignal = 0; iSignal < obj->nSignals; iSignal++)
     {
 
-        maxValue = -INFINITY;
-        peakFound = 0x00;
-
+        maxValue[0] = 0;
+        maxValue[1] = 0;
+        nPeaksFound = 0;
+ 
         for (iBin = obj->winSize; iBin < (obj->halfFrameSize - obj->winSize); iBin++)
         {
 
             peakValue = acorrs->array[iSignal][iBin];
-
             isPeak = 0x01;
-            if (peakValue > 0.1)
-            {
 
+            if (peakValue > 0.0
+            {
                 for (iWin = -1 * ((signed int)(obj->winSize)); iWin <= ((signed int)(obj->winSize)); iWin++)
                 {
-
                     iSample = iBin + iWin;
                     nextValue = acorrs->array[iSignal][iSample];
 
                     if ((iWin != 0) && (peakValue <= nextValue))
                     {
-
                         isPeak = 0x00;
                         break;
                     }
@@ -99,18 +93,17 @@ void acorr2pitch_process(acorr2pitch_obj *obj, const acorrs_obj *acorrs, pitches
                 if (isPeak == 0x01)
                 {
 
-                    if (peakValue > maxValue)
+                    if (peakValue > maxValue[numPeaksFound])
                     {
 
-                        maxValue = peakValue;
-                        maxIndex = iBin;
-
-                        peakFound = 0x01;
+                        maxValue[numPeaksFound] = peakValue;
+                        maxIndex[numPeaksFound] = iBin;
+                        ++numPeaksFound;
                     }
                 }
             }
 
-            if (peakFound == 0x01)
+            if (numPeaksFound == 2)
             {
                 peakPrev = maxIndex - 1;
                 peakNow = maxIndex;

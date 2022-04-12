@@ -38,28 +38,39 @@
 
         float tauMin;
         float tauMax;
-        float deltaTauMax;
-        float alpha;
-        float gamma;
-        float phiMin;
-        float r0;
+        float tauVarMin;
+        float tauVarMax;
+        float activityVarMin;
+        float activityVarMax;
+        float harmonicMin;
+        float harmonicMax;
+        unsigned int samplesMin;
+        unsigned int samplesMax;
+        float activityMin;
+        float acorrMin;
 
-        float * tausNow;
-        float * tausPrev;
-        float * deltaTausNow;
-        float * deltaTausPrev;
-        float * phisNow;
-        float * phisPrev;
-        float * vs;
-        float * rs;
+        unsigned int classificationPeriod;
+        unsigned int * processingTime;
+
+        unsigned int * numPitchValues;
+        unsigned int ** activityArray; // 2D array
+        unsigned int * activityTotal; // 1D array
+        unsigned int ** pitchArray; // 2D array
+        unsigned int * pitchTotal; // 1D array
+        float        * harmonicAcorrTotal; // 1D array
+
+        float * meanPitch;
         char * categories;
 
     } pitch2category_obj;
 
-    pitch2category_obj * pitch2category_construct_zero(const unsigned int nSeps, const float tauMin, const float tauMax, const float deltaTauMax, const float alpha, const float gamma, const float phiMin, const float r0);
+    pitch2category_obj * pitch2category_construct_zero(const unsigned int nSeps, const unsigned int tauMin, 
+    const unsigned int tauMax, const float varTauMax, const float varTauMin, const float activityVarMin, 
+    const float activityVarMax,const float harmonicMin, const float harmonicMax, const unsigned int minSamples, 
+    const unsigned int maxSamples, const float activityMin, const float acorrMin, const unsigned int classificationPeriod);
 
     void pitch2category_destroy(pitch2category_obj * obj);
 
-    void pitch2category_process(pitch2category_obj * obj, const pitches_obj * pitches, const tracks_obj * tracks, categories_obj * categories);
+    void pitch2category_process(pitch2category_obj * obj, const pitches_obj * pitches, const tracks_obj * tracks, categories_obj * categories, const unsigned int iSep);
 
 #endif

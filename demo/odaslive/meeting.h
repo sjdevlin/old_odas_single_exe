@@ -12,12 +12,12 @@
 #include "audio.h"
 
 #define MAXPART 8
-#define MAXSILENCE 100 // temp small for debug
+#define MAXSILENCE 300 // temp small for debug
 #define NUMCHANNELS 3
-#define ANGLESPREAD 20
+#define ANGLESPREAD 30
 #define MINTURNSILENCE 30
 #define MINENERGY 0.2
-#define MINTALKTIME 10
+#define MINTALKTIME 5
 
 extern char debug_mode;
 
@@ -30,6 +30,7 @@ void process_latest_data(AUDIO);
 
 
 struct participant_data{
+    int last_track_id;
     int angle;
     int is_talking;
     int silent_time;

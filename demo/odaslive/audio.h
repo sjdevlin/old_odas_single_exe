@@ -27,7 +27,7 @@ public:
     void stop();
     void get_data();
 
-    float energy_array[4];
+    unsigned long track_id[4];
     float x_array[4];
     float y_array[4];
     float freq_array[4];

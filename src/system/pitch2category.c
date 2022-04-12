@@ -1,204 +1,218 @@
+/**
+ * \file     pitch2category.c
+ * \author   François Grondin <francois.grondin2@usherbrooke.ca>
+ * \version  2.0
+ * \date     2018-03-18
+ * \copyright
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-   /**
-    * \file     pitch2category.c
-    * \author   François Grondin <francois.grondin2@usherbrooke.ca>
-    * \version  2.0
-    * \date     2018-03-18
-    * \copyright
-    *
-    * This program is free software: you can redistribute it and/or modify
-    * it under the terms of the GNU General Public License as published by
-    * the Free Software Foundation, either version 3 of the License, or
-    * (at your option) any later version.
-    *
-    * This program is distributed in the hope that it will be useful,
-    * but WITHOUT ANY WARRANTY; without even the implied warranty of
-    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    * GNU General Public License for more details.
-    * 
-    * You should have received a copy of the GNU General Public License
-    * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-    *
-    */
-    
-    #include <system/pitch2category.h>
+#include <system/pitch2category.h>
 
-    pitch2category_obj * pitch2category_construct_zero(const unsigned int nSeps, const float tauMin, const float tauMax, const float deltaTauMax, const float alpha, const float gamma, const float phiMin, const float r0) {
+pitch2category_obj *pitch2category_construct_zero(const unsigned int nSeps, const unsigned int tauMin, const unsigned int tauMax, const float tauVarMin, const float tauVarMax, const float activityVarMin, const float activityVarMax, const float harmonicMin, const float harmonicMax, const unsigned int samplesMin, const unsigned int samplesMax, const float activityMin, const float acorrMin, const unsigned int classificationPeriod)
+{
 
-        pitch2category_obj * obj;
+    pitch2category_obj *obj;
 
-        obj = (pitch2category_obj *) malloc(sizeof(pitch2category_obj));
+    unsigned int iSep;
 
-        obj->nSeps = nSeps;
+    obj = (pitch2category_obj *)malloc(sizeof(pitch2category_obj));
 
-        obj->tauMin = tauMin;
-        obj->tauMax = tauMax;
-        obj->deltaTauMax = deltaTauMax;
-        obj->alpha = alpha;
-        obj->gamma = gamma;
-        obj->phiMin = phiMin;
-        obj->r0 = r0;
+    obj->nSeps = nSeps;
 
-        obj->tausNow = (float *) malloc(sizeof(float) * nSeps);
-        memset(obj->tausNow, 0x00, sizeof(float) * nSeps);
+    obj->tauMin = tauMin;
+    obj->tauMax = tauMax;
 
-        obj->tausPrev = (float *) malloc(sizeof(float) * nSeps);
-        memset(obj->tausPrev, 0x00, sizeof(float) * nSeps);
+    obj->tauVarMin = tauVarMin;
+    obj->tauVarMax = tauVarMax;
+    obj->activityVarMin = activityVarMin;
+    obj->activityVarMax = activityVarMax;
+    obj->harmonicMin = harmonicMin;
+    obj->harmonicMax = harmonicMax;
+    obj->samplesMin = samplesMin;
+    obj->samplesMax = samplesMax;
+    obj->activityMin = activityMin;
+    obj->acorrMin = acorrMin;
 
-        obj->deltaTausNow = (float *) malloc(sizeof(float) * nSeps);
-        memset(obj->deltaTausNow, 0x00, sizeof(float) * nSeps);
+    // sd changed to improve classification
+    obj->classificationPeriod = classificationPeriod;
 
-        obj->deltaTausPrev = (float *) malloc(sizeof(float) * nSeps);
-        memset(obj->deltaTausPrev, 0x00, sizeof(float) * nSeps);
+    obj->categories = (char *)malloc(sizeof(char) * nSeps);
+    memset(obj->categories, 0x00, sizeof(char) * nSeps);
 
-        obj->phisNow = (float *) malloc(sizeof(float) * nSeps);
-        memset(obj->phisNow, 0x00, sizeof(float) * nSeps);
+    // sd changed to improve classification
+    obj->processingTime = (unsigned int *)malloc(sizeof(unsigned int) * nSeps);
+    memset(obj->processingTime, 0x00, sizeof(unsigned int) * nSeps);
 
-        obj->phisPrev = (float *) malloc(sizeof(float) * nSeps);
-        memset(obj->phisPrev, 0x00, sizeof(float) * nSeps);        
+    obj->numPitchValues = (unsigned int *)malloc(sizeof(unsigned int) * nSeps);
+    memset(obj->numPitchValues, 0x00, sizeof(unsigned int) * nSeps);
 
-        obj->vs = (float *) malloc(sizeof(float) * nSeps);
-        memset(obj->vs, 0x00, sizeof(float) * nSeps);
+    obj->pitchArray = (unsigned int **)malloc(sizeof(unsigned int *) * nSeps);
+    obj->activityArray = (unsigned int **)malloc(sizeof(unsigned int *) * nSeps);
 
-        obj->rs = (float *) malloc(sizeof(float) * nSeps);
-        memset(obj->rs, 0x00, sizeof(float) * nSeps);
-
-        obj->categories = (char *) malloc(sizeof(char) * nSeps);
-        memset(obj->categories, 0x00, sizeof(char) * nSeps);
-
-        return obj;
-
+    for (iSep = 0; iSep < nSeps; iSep++)
+    {
+        obj->pitchArray[iSep] = (unsigned int *)malloc(sizeof(unsigned int) * classificationPeriod);
+        memset(obj->pitchArray[iSep], 0x00, sizeof(unsigned int) * classificationPeriod);
+        obj->activityArray[iSep] = (unsigned int *)malloc(sizeof(unsigned int) * classificationPeriod);
+        memset(obj->activityArray[iSep], 0x00, sizeof(unsigned int) * classificationPeriod);
     }
 
-    void pitch2category_destroy(pitch2category_obj * obj) {
+    obj->activityTotal = (unsigned int *)malloc(sizeof(unsigned int) * nSeps);
+    memset(obj->activityTotal, 0x00, sizeof(unsigned int) * nSeps);
+    obj->pitchTotal = (unsigned int *)malloc(sizeof(unsigned int) * nSeps);
+    memset(obj->pitchTotal, 0x00, sizeof(unsigned int) * nSeps);
+    obj->harmonicAcorrTotal = (float *)malloc(sizeof(float) * nSeps);
+    memset(obj->harmonicAcorrTotal, 0x00, sizeof(float) * nSeps);
 
-        free((void *) obj->tausNow);
-        free((void *) obj->tausPrev);
-        free((void *) obj->deltaTausNow);
-        free((void *) obj->deltaTausPrev);
-        free((void *) obj->phisNow);
-        free((void *) obj->phisPrev);
-        free((void *) obj->vs);
-        free((void *) obj->rs);
-        free((void *) obj->categories);
+    obj->meanPitch = (float *)malloc(sizeof(unsigned int) * nSeps);
+    memset(obj->meanPitch, 0x00, sizeof(float) * nSeps);
 
-        free((void *) obj);
 
+    return obj;
+}
+
+void pitch2category_destroy(pitch2category_obj *obj)
+{
+    unsigned int iSep;
+
+    free((void *)obj->categories);
+
+    for (iSep = 0; iSep < obj->nSeps; iSep++)
+    {
+        free((void *)obj->activityArray[iSep]);
+        free((void *)obj->pitchArray[iSep]);
     }
 
-    void pitch2category_process(pitch2category_obj * obj, const pitches_obj * pitches, const tracks_obj * tracks, categories_obj * categories) {
+    free((void *)obj->pitchArray);
+    free((void *)obj->activityArray);
 
-        unsigned int iSep;
-        float deltaPitch;
+    free((void *)obj->harmonicAcorrTotal);
 
-        for (iSep = 0; iSep < obj->nSeps; iSep++) {
+    free((void *)obj->pitchTotal);
 
-            if (tracks->ids[iSep] != 0) {
+    free((void *)obj->numPitchValues);
+    free((void *)obj->activityTotal);
+    free((void *)obj->processingTime);
+    free((void *)obj->meanPitch);
 
-// sd set freq to current pitch
+    free((void *)obj);
+}
 
-//                categories->freq_array[iSep] = (0.1 * pitches->array[iSep]) + (0.9 * categories->freq_array[iSep]);
+void pitch2category_process(pitch2category_obj *obj, const pitches_obj *pitches, const tracks_obj *tracks, categories_obj *categories, const unsigned int iSep)
+{
+    int i;
+    float deltaPitch;
+    float rmsMean, activityMean, pitchMean, harmonicAcorrMean;
+    float activityDiff, rmsDiff, pitchDiff;
+    float totalRmsDiffSquared, totalActivityDiffSquared, totalPitchDiffSquared;
+    float relActivityVariance, relPitchVariance;
 
+    // add activity to array
+    if (obj->processingTime[iSep] < obj->classificationPeriod)
+    {
+        obj->activityArray[iSep][obj->processingTime[iSep]] = (unsigned int)(tracks->activity[iSep] * 100.0);
+        //    printf ("(A) %d,  %3.3f, %d \n", obj->processingTime[iSep], tracks->activity[iSep], obj->activityArray[iSep][obj->processingTime[iSep]]);
+        // also calculate activity total for variance analysis
+        obj->activityTotal[iSep] += obj->activityArray[iSep][obj->processingTime[iSep]]; // to avoid iterating a second time
 
+        if (pitches->array[iSep] > 0) // skip analysis when no peak found
+        {
+            obj->pitchArray[iSep][obj->numPitchValues[iSep]] = pitches->array[iSep];
+            obj->pitchTotal[iSep] += obj->pitchArray[iSep][obj->numPitchValues[iSep]];
+            obj->harmonicAcorrTotal[iSep] += pitches->harmonicAcorr[iSep];
+            ++obj->numPitchValues[iSep];
+        }
 
-                if (obj->categories[iSep] == 0x01) {
+        // when classification period is ended do all the processing
+    }
+    else if (obj->processingTime[iSep] == obj->classificationPeriod) // we have reached time to classify as speech
+    {
 
-                        categories->freq_array[iSep] = pitches->array[iSep];
-                        categories->energy_array[iSep] = tracks->activity[iSep];
-                        categories->X_array[iSep] = tracks->array[3*iSep];
-                        categories->Y_array[iSep] = tracks->array[3*iSep+1];
+        // calculate mean of activity
+        activityMean = (float)obj->activityTotal[iSep] / (float)obj->classificationPeriod;
+        // calculate mean of rms
 
+        if (obj->numPitchValues[iSep] != 0)
+        {
+            pitchMean = (float)obj->pitchTotal[iSep] / (float)obj->numPitchValues[iSep]; // consider changing to int for spped
+            harmonicAcorrMean = obj->harmonicAcorrTotal[iSep] / (float)obj->numPitchValues[iSep];
+        }
+        else
+        {
+            pitchMean = 0.0f;
+            harmonicAcorrMean = 0.0f;
+        }
 
-		    } 
-		    else {
-                    // tau_i
-                    obj->tausNow[iSep] = pitches->array[iSep];
+        totalActivityDiffSquared = 0.0f;
+        totalRmsDiffSquared = 0.0f;
+        totalPitchDiffSquared = 0.0f;
 
-                    // delta_tau_i
-                    obj->deltaTausNow[iSep] = obj->tausNow[iSep] - obj->tausPrev[iSep];
+        // relative variance of amplitide and E (for comparison)
 
-                    // phi_i
-                    if ((fabs(obj->deltaTausNow[iSep]) < obj->deltaTauMax) && (fabs(obj->deltaTausPrev[iSep]) < obj->deltaTauMax)) {
+        for (i = 0; i < obj->classificationPeriod; i++)
+        {
+            activityDiff = (float)obj->activityArray[iSep][i] - activityMean;
+            totalActivityDiffSquared += (activityDiff * activityDiff); // consider changing to powf
+                                                                       //            printf ("(B) %d , %d  \n", i, obj->activityArray[iSep][obj->processingTime[iSep]]);
+        }
 
-                        obj->phisNow[iSep] = (1 - obj->alpha) * obj->phisPrev[iSep] + obj->alpha * obj->deltaTausNow[iSep];
+        // relative variance of pitch
 
-                    }
-                    else if ((fabs(obj->deltaTausNow[iSep]) < obj->deltaTauMax) && (fabs(obj->deltaTausPrev[iSep]) >= obj->deltaTauMax)) {
+        for (i = 0; i < obj->numPitchValues[iSep]; i++)
+        {
+            pitchDiff = (float)obj->pitchArray[iSep][i] - pitchMean; // consider changing to int
+            totalPitchDiffSquared += (pitchDiff * pitchDiff);        // consider powf?
+        }
 
-                        obj->phisNow[iSep] = obj->deltaTausNow[iSep];
+        // rel variance is variance / mean ^2
 
-                    }
-                    else {
+        relActivityVariance = (totalActivityDiffSquared / (float)obj->classificationPeriod) / (activityMean * activityMean);
 
-                        obj->phisNow[iSep] = 0.0f;
+        if (obj->numPitchValues[iSep] != 0)
+        {
+            relPitchVariance = (totalPitchDiffSquared / (float)obj->numPitchValues[iSep]) / (pitchMean * pitchMean);
+        }
+        else
+        {
+            relPitchVariance = 0.0f;
+        }
 
-                    }
-
-                    // v_i
-                    if ((obj->tausNow[iSep] >= obj->tauMin) && (obj->tausNow[iSep] <= obj->tauMax) && fabs(obj->phisNow[iSep]) > obj->phiMin) {
-
-                        obj->vs[iSep] = 1.0f;
-
-                    }
-                    else {
-
-                        obj->vs[iSep] = 0.0f;
-
-                    }
-
-                    // r_i
-                    obj->rs[iSep] = (1.0f - obj->gamma) * obj->rs[iSep] + obj->gamma * obj->vs[iSep];
-
-                    // Classify
-
-                    if (obj->rs[iSep] > obj->r0) {
-
-                        // Speech
-                        obj->categories[iSep] = 0x01;
-
-			printf("yes  f: %f3.2  d: %f2.2  pd: %f2.2  \n",obj->tausNow[iSep], obj->deltaTausNow[iSep], obj->deltaTausPrev[iSep]);
-
-                        //only if MeetPie thinks its speech do we assign values
-
-                    }
-                    else {
-
-			printf("no   f: %f3.2  d: %f2.2  pd: %f2.2  \n",obj->tausNow[iSep], obj->deltaTausNow[iSep], obj->deltaTausPrev[iSep]);
-                        // Non speech
-                        obj->categories[iSep] = 0x00;
-
-                    }
-
-                    // tau_i-1 = tau_i
-                    memcpy(obj->tausPrev, obj->tausNow, sizeof(float) * obj->nSeps);
-
-                    // delta_tau_i-1 = delta_tau_i
-                    memcpy(obj->deltaTausPrev, obj->deltaTausNow, sizeof(float) * obj->nSeps);
-
-                    // phi_i-1 = phi_i
-                    memcpy(obj->phisPrev, obj->phisNow, sizeof(float) * obj->nSeps);
-
-                }
-
-
-            }
-            else {
-
-                obj->tausNow[iSep] = 0.0f;
-                obj->deltaTausNow[iSep] = 0.0f;
-                obj->phisNow[iSep] = 0.0f;
-                obj->vs[iSep] = 0.0f;
-                obj->rs[iSep] = 0.0f;
-                obj->categories[iSep] = 0x00;
-
-                categories->freq_array[iSep] = 0.0f;
-                categories->energy_array[iSep] = 0.0f;
-                categories->X_array[iSep] = 0.0f;
-                categories->Y_array[iSep] = 0.0f;
+        // decide if it is speech or not !
+        if (pitchMean > obj->tauMax || pitchMean < obj->tauMin) printf ("failed pitch\n");
+        if (relPitchVariance  > obj->tauVarMax || relPitchVariance  < obj->tauVarMin) printf ("failed pitch var\n");
+        if (relActivityVariance  > obj->activityVarMax || relActivityVariance  < obj->activityVarMin) printf ("failed act var \n");
+        if (harmonicAcorrMean > obj->harmonicMax || harmonicAcorrMean < obj->harmonicMin ) printf ("failed harmonic\n");
+        if (obj->numPitchValues[iSep] < obj->samplesMin || obj->numPitchValues[iSep] > obj->samplesMax) printf ("failed samples\n");
 
 
-            }
-
+        if (pitchMean <= obj->tauMax && pitchMean >= obj->tauMin &&
+            relPitchVariance <= obj->tauVarMax && relPitchVariance >= obj->tauVarMin &&
+            relActivityVariance <= obj->activityVarMax && relActivityVariance >= obj->activityVarMin &&
+            harmonicAcorrMean <= obj->harmonicMax && harmonicAcorrMean >= obj->harmonicMin &&
+            obj->numPitchValues[iSep] <= obj->samplesMax && obj->numPitchValues[iSep] >= obj->samplesMin)
+        {
+            obj->categories[iSep] = 0x02; // speech
+            obj->meanPitch[iSep] = pitchMean;
+        }
+        else
+        {
+            obj->categories[iSep] = 0x01;
+            printf("Non Speech%llu, %3.2f, %2.2f, %2.2f, %2.2f, %d \n", tracks->ids[iSep], pitchMean, relPitchVariance, relActivityVariance, harmonicAcorrMean, obj->numPitchValues[iSep]);
         }
 
     }
+}

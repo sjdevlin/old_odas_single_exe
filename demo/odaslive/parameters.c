@@ -1948,34 +1948,73 @@
             cfg->tauMax = parameters_lookup_int(fileConfig, "classify.tauMax");
 
         // +----------------------------------------------------------+
-        // | deltaTauMax                                              |
+        // | varTauMin                                                   |
         // +----------------------------------------------------------+
 
-            cfg->deltaTauMax = parameters_lookup_int(fileConfig, "classify.deltaTauMax");
+            cfg->varTauMin = parameters_lookup_float(fileConfig, "classify.varTauMin");
 
         // +----------------------------------------------------------+
-        // | alpha                                                    |
+        // | varTauMax                                                   |
         // +----------------------------------------------------------+
 
-            cfg->alpha = parameters_lookup_float(fileConfig, "classify.alpha");
+            cfg->varTauMax = parameters_lookup_float(fileConfig, "classify.varTauMax");
 
         // +----------------------------------------------------------+
-        // | gamma                                                    |
+        // | varActivityMin                                           |
         // +----------------------------------------------------------+
 
-            cfg->gamma = parameters_lookup_float(fileConfig, "classify.gamma");
+            cfg->activityVarMin = parameters_lookup_float(fileConfig, "classify.activityVarMin");
 
         // +----------------------------------------------------------+
-        // | phiMin                                                   |
+        // | varActivityMax                                           |
         // +----------------------------------------------------------+
 
-            cfg->phiMin = parameters_lookup_float(fileConfig, "classify.phiMin");
+            cfg->activityVarMax = parameters_lookup_float(fileConfig, "classify.activityVarMax");
 
         // +----------------------------------------------------------+
-        // | r0                                                       |
-        // +----------------------------------------------------------+           
+        // | harmonicMin                                                   |
+        // +----------------------------------------------------------+
 
-            cfg->r0 = parameters_lookup_float(fileConfig, "classify.r0");
+            cfg->harmonicMin = parameters_lookup_float(fileConfig, "classify.harmonicMin");
+
+        // +----------------------------------------------------------+
+        // | harmonicMax                                                   |
+        // +----------------------------------------------------------+
+
+            cfg->harmonicMax = parameters_lookup_float(fileConfig, "classify.harmonicMax");
+
+        // +----------------------------------------------------------+
+        // | samplesMin                                                   |
+        // +----------------------------------------------------------+
+
+            cfg->samplesMin = parameters_lookup_int(fileConfig, "classify.samplesMin");
+
+        // +----------------------------------------------------------+
+        // | samplesMax                                                   |
+        // +----------------------------------------------------------+
+
+            cfg->samplesMax = parameters_lookup_int(fileConfig, "classify.samplesMax");
+
+        // +----------------------------------------------------------+
+        // | activityMin                                                   |
+        // +----------------------------------------------------------+
+
+            cfg->activityMin = parameters_lookup_float(fileConfig, "classify.activityMin");
+
+        // +----------------------------------------------------------+
+        // | acorrMin                                                   |
+        // +----------------------------------------------------------+
+
+            cfg->acorrMin = parameters_lookup_float(fileConfig, "classify.acorrMin");
+
+        // +----------------------------------------------------------+
+        // | classification Period                                                   |
+        // +----------------------------------------------------------+
+
+            cfg->classificationPeriod = parameters_lookup_int(fileConfig, "classify.classificationPeriod");
+
+
+
 
         return cfg;
 

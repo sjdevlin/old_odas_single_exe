@@ -89,9 +89,11 @@
 
         if (obj->in->timeStamp != 0) {
 
-            if (obj->in->timeStamp%50 == 0) {
+            if (obj->in->timeStamp%25 == 0) {
 
-            memcpy(obj->safe_buffer->energy_array,obj->in->categories->energy_array, sizeof(float) * obj->nChannels);
+//            printf("Snk Process X: %3.2f, Y: %3.2f, f: %3.2f\n", obj->in->categories->X_array[0], obj->in->categories->Y_array[0], obj->in->categories->freq_array[0]);
+
+            memcpy(obj->safe_buffer->track_id, obj->in->categories->track_id, sizeof(unsigned long) * obj->nChannels);
             memcpy(obj->safe_buffer->X_array,obj->in->categories->X_array, sizeof(float) * obj->nChannels);
             memcpy(obj->safe_buffer->Y_array,obj->in->categories->Y_array, sizeof(float) * obj->nChannels);
             memcpy(obj->safe_buffer->freq_array,obj->in->categories->freq_array, sizeof(float) * obj->nChannels);

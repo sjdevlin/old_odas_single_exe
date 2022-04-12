@@ -6,10 +6,9 @@ MEETPIE::MEETPIE(uint16_t leds) : matrix_image1d(leds)
 {
 
     gpio_input_mode = 0; // input
-    start_stop_pin = 0;  // GPIO 0
-    mode_pin = 1;        // GPIO 1
+    start_stop_pin = 1 ; // GPIO 1
     mode = DEBUG; // default mode for now (will change to dark for produciton)
-    num_leds = leds;     // This allows both Matrix Creator (32 Leds) and Voice (18 Leds) can be used
+    num_leds = leds;     // This allows both Matrix Creator (35 Leds) and Voice (18 Leds) can be used
 
     if (!matrix_bus.Init())
         printf("Bus did not load \n"); // Question for JJ.  Advice for error handling...
@@ -17,7 +16,7 @@ MEETPIE::MEETPIE(uint16_t leds) : matrix_image1d(leds)
     // Initialize the Matrix Hal Bus and set GPI pins to input
     matrix_gpio.Setup(&matrix_bus);
     matrix_gpio.SetMode(start_stop_pin, 0); // 0 sets pin for input
-    matrix_gpio.SetMode(mode_pin, 0);       // 0 sets pin for input
+//    matrix_gpio.SetMode(mode_pin, 0);       // 0 sets pin for input
     matrix_everloop.Setup(&matrix_bus);
 
     // these variables are for share of voice led display
@@ -271,7 +270,7 @@ void MEETPIE::write_to_file(MEETING meeting_obj)
     }
 
     // switch off any lights
-
+/*
     for (int i = 0; i <= 255; i++)
     {
         // For each led in everloop_image.leds, set led value
@@ -290,12 +289,51 @@ void MEETPIE::write_to_file(MEETING meeting_obj)
             usleep(100);
         }
     }
+*/
+
 }
 
 bool MEETPIE::button_pressed(uint16_t pin)
 {
-    bool temp;
-    temp = matrix_gpio.GetGPIOValue(pin);
-    //    printf("button %d: %d \n", pin, temp);
-    return temp;
+    bool is_button_pressed;
+    is_button_pressed = !matrix_gpio.GetGPIOValue(pin); // ! operator because its a pullup
+    return is_button_pressed;
+}
+
+void MEETPIE::light_led(uint16_t led_number, char colour)
+{
+    switch (colour)
+    {
+    case RED:
+        matrix_image1d.leds[led_number].red = 155;
+        break;
+
+    case GREEN:
+        matrix_image1d.leds[led_number].green = 100;
+        break;
+
+    case AMBER:
+        matrix_image1d.leds[led_number].red = 100;
+        matrix_image1d.leds[led_number].green = 25;
+        break;
+
+    case OFF:
+        matrix_image1d.leds[led_number].red = 0;
+        matrix_image1d.leds[led_number].green = 0;
+        break;
+    }
+
+    matrix_everloop.Write(&matrix_image1d);
+}
+
+void MEETPIE::darken_all_led()
+{
+    for (matrix_hal::LedValue &led : matrix_image1d.leds)
+    {
+        led.red = 0;
+        led.green = 0;
+        led.blue = 0;
+        led.white = 0;
+        matrix_everloop.Write(&matrix_image1d);
+    }
 }

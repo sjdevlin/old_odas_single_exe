@@ -31,8 +31,8 @@
 
         obj->nSignals = nSignals;
 
-        obj->energy_array = (float *) malloc(sizeof(float) * nSignals);
-        memset(obj->energy_array, 0x00, sizeof(float) * nSignals);
+        obj->track_id = (unsigned long *) malloc(sizeof(unsigned long) * nSignals);
+        memset(obj->track_id, 0x00, sizeof(unsigned long) * nSignals);
 
         obj->X_array = (float *) malloc(sizeof(float) * nSignals);
         memset(obj->X_array, 0x00, sizeof(float) * nSignals);
@@ -51,7 +51,7 @@
 
     void categories_destroy(categories_obj * obj) {
 
-        free((void *) obj->energy_array);
+        free((void *) obj->track_id);
         free((void *) obj->X_array);
         free((void *) obj->Y_array);
         free((void *) obj->freq_array);
@@ -61,7 +61,7 @@
 
     void categories_copy(categories_obj * dest, const categories_obj * src) {
 
-        memcpy(dest->energy_array, src->energy_array, sizeof(float) * src->nSignals);
+        memcpy(dest->track_id, src->track_id, sizeof(unsigned long) * src->nSignals);
         memcpy(dest->X_array, src->X_array, sizeof(float) * src->nSignals);
         memcpy(dest->Y_array, src->Y_array, sizeof(float) * src->nSignals);
         memcpy(dest->freq_array, src->freq_array, sizeof(float) * src->nSignals);
@@ -70,7 +70,7 @@
 
     void categories_zero(categories_obj * obj) {
 
-        memset(obj->energy_array, 0x00, sizeof(float) * obj->nSignals);
+        memset(obj->track_id, 0x00, sizeof(unsigned long) * obj->nSignals);
         memset(obj->X_array, 0x00, sizeof(float) * obj->nSignals);
         memset(obj->Y_array, 0x00, sizeof(float) * obj->nSignals);
         memset(obj->freq_array, 0x00, sizeof(float) * obj->nSignals);
@@ -85,7 +85,7 @@
 
             printf("(%02u): %3.2f\n",iSignal,obj->X_array[iSignal]);
             printf("(%02u): %3.2f\n",iSignal,obj->Y_array[iSignal]);
-            printf("(%02u): %3.2f\n",iSignal,obj->energy_array[iSignal]);
+            printf("(%02u): %llu\n",iSignal,obj->track_id[iSignal]);
             printf("(%02u): %3.2f\n",iSignal,obj->freq_array[iSignal]);
 
         }

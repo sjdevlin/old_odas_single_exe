@@ -26,6 +26,18 @@
 #define SHAREOFVOICE 1
 #define DEBUG 2
 
+#define STARTLED 9
+#define MODELED 12
+#define DARKLED 15
+#define PIELED 18
+#define DEBUGLED 21
+
+#define RED 0x01
+#define AMBER 0x02
+#define GREEN 0x03
+#define OFF 0x00
+
+
 
 class MEETPIE
 {
@@ -35,6 +47,10 @@ public:
     void update(MEETING);
     void write_to_file(MEETING);
     bool button_pressed(uint16_t);
+    void light_led(uint16_t, char);
+    void darken_all_led();
+
+
 
     int mode;
     uint16_t start_stop_pin;

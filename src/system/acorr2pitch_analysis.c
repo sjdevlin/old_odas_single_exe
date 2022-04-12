@@ -72,11 +72,10 @@ void acorr2pitch_process(acorr2pitch_obj *obj, const acorrs_obj *acorrs, pitches
 
     for (iBin = 0; iBin < obj->halfFrameSize; iBin++)
     {
-        printf("%1.3f ", acorrs->array[0][iBin]*100);
+        printf("%1.3f, ", acorrs->array[0][iBin]*100);
     }
+    printf("\n");
 
     pitches->array[0] = 0.0f;
-
-        printf("\nend\n", acorrs->array[0][iBin]);
 
 }

@@ -55,10 +55,24 @@ void MEETING::process_latest_data(AUDIO odas_obj)
 
     for (iChannel = 0; iChannel < NUMCHANNELS; iChannel++)
     {
+        bool channel_already_assigned = false;
 
-        //  dont use energy to check if track is active otherwise you miss the ending of the speech and
-        //  participant talking is never set to false
-        if (odas_obj.x_array[iChannel] != 0.0 || odas_obj.y_array[iChannel] != 0.0)
+        for (i = 1; i <= num_participants; i++)
+        {
+            if (participant[i].last_track_id = odas_obj.track_id[iChannel])
+            {
+                // this person was already talking
+                participant[i].is_talking = 1;
+                ++participant[i].total_talk_time;
+                ++num_talking;
+                channel_already_assigned = true;  
+            }
+
+        }
+        
+        // new source - but need to check if they are known
+
+        if (odas_obj.track_id[iChannel] != 0 && !channel_already_assigned)
         {
             total_silence = 0; // consider moving this
             target_angle = 180 - (atan2(odas_obj.y_array[iChannel], odas_obj.x_array[iChannel]) * 57.3);
@@ -126,9 +140,9 @@ void MEETING::process_latest_data(AUDIO odas_obj)
                     }
                 }
             }
-            else // its an existing talker we're hearing
+            else // its an existing talker we're hearing - but a new "source" id
             {
-                // could put logic in here to count turns
+                participant[participant_at_angle[target_angle]].last_track_id = odas_obj.track_id[iChannel]; // assign track id so we dont process again - avoids tracking sources !
                 participant[participant_at_angle[target_angle]].is_talking = 1;
                 ++participant[participant_at_angle[target_angle]].total_talk_time;
                 ++num_talking;
@@ -153,7 +167,13 @@ void MEETING::process_latest_data(AUDIO odas_obj)
         ++total_talk_time;
         for (i = 1; i <= num_participants; i++)
         {
-            if (participant[i].is_talking == 1) last_talker = i;
+            if (participant[i].is_talking == 1 && last_talker != i) 
+            {
+                ++participant[i].num_turns;
+                last_talker = i;
+            }
+
+            // put turns logic here ?
         }
         break;
         

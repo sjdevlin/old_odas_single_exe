@@ -4,7 +4,7 @@ AUDIO::AUDIO()
 {
     for (int i = 0; i < 4;i++)
     {
-        energy_array[i] = 0.0;
+        track_id[i] = 0;
         x_array[i] = 0.0;
         y_array[i] = 0.0;
         freq_array[i] = 0.0;
@@ -18,7 +18,7 @@ void AUDIO::get_data()
 
     for (int i = 0; i < aobjs->asnk_categories_object->snk_categories->nChannels;i++)
     {
-        energy_array[i] = aobjs->asnk_categories_object->snk_categories->safe_buffer->energy_array[i];
+        track_id[i] = aobjs->asnk_categories_object->snk_categories->safe_buffer->track_id[i];
         x_array[i] = aobjs->asnk_categories_object->snk_categories->safe_buffer->X_array[i];
         y_array[i] = aobjs->asnk_categories_object->snk_categories->safe_buffer->Y_array[i];
         freq_array[i] = aobjs->asnk_categories_object->snk_categories->safe_buffer->freq_array[i];

@@ -1,7 +1,9 @@
 {
     "C_Cpp.default.configurationProvider": "ms-vsvode.cmake-tools",
     "files.associations": {
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "pitch.h": "c",
+        "pitch2category.h": "c"
     },
     "cmake.configureOnOpen": false
 }
